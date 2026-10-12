@@ -1,7 +1,7 @@
 @extends('layouts.auth')
 @section('title', 'Admin Login')
 @section('content')
-<div class="auth-heading"><h1>Welcome backs</h1><p>Sign in to your Eemo-Find admin workspace.</p></div>
+<div class="auth-heading"><h1>Welcome back</h1><p>Sign in to your Eemo-Find admin workspace.</p></div>
 <x-alert />
 <form method="POST" action="{{ route('admin.login.store') }}" class="stack">@csrf
 <x-field name="email" label="Email address" type="email" placeholder="you@example.com" autocomplete="username" required autofocus />
