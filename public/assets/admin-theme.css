@@ -74,6 +74,24 @@ body.admin-shell {
     border-color: #dfe9f8;
 }
 
+.admin-shell .nav {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-color: #b7cce8 transparent;
+    scrollbar-width: thin;
+}
+
+.admin-shell .nav::-webkit-scrollbar {
+    width: 6px;
+}
+
+.admin-shell .nav::-webkit-scrollbar-thumb {
+    background: #b7cce8;
+    border-radius: 6px;
+}
+
 .admin-shell .brand-symbol {
     color: #ffffff;
     background: linear-gradient(140deg, #2879ff, #7046ef);
@@ -230,30 +248,6 @@ body.admin-shell {
     background: #ffffff;
     box-shadow: 0 3px 12px rgba(20, 44, 74, .14);
     font-size: 13px;
-}
-
-.traffic-demo-badge {
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    z-index: 2;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 9px 12px;
-    border: 1px solid #dfe9f8;
-    border-radius: 20px;
-    color: #526b87;
-    background: #ffffff;
-    box-shadow: 0 3px 12px rgba(20, 44, 74, .12);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: .8px;
-}
-
-.traffic-demo-badge .status-dot {
-    background: #e7a900;
-    box-shadow: 0 0 0 3px rgba(231, 169, 0, .12);
 }
 
 .traffic-metrics {

@@ -31,11 +31,12 @@ document.addEventListener('keydown', event => {
 });
 window.addEventListener('resize', closeSidebar);
 closeSidebar();
-const securityToggle = document.getElementById('security-toggle');
-securityToggle?.addEventListener('click', () => {
-    const open = securityToggle.getAttribute('aria-expanded') === 'true';
-    securityToggle.setAttribute('aria-expanded', String(!open));
-    document.getElementById('security-submenu').hidden = open;
+document.querySelectorAll('[data-submenu-toggle]').forEach(toggle => {
+    toggle.addEventListener('click', () => {
+        const open = toggle.getAttribute('aria-expanded') === 'true';
+        toggle.setAttribute('aria-expanded', String(!open));
+        document.getElementById(toggle.dataset.submenuToggle).hidden = open;
+    });
 });
 const dialog = document.getElementById('confirm-dialog');
 let pendingForm;
@@ -78,8 +79,12 @@ if (trafficMap) {
             new google.maps.Map(trafficMap, {
                 center,
                 zoom: 5,
-                mapTypeControl: false,
-                streetViewControl: false,
+                mapTypeId: google.maps.MapTypeId.SATELLITE,
+                mapTypeControl: true,
+                streetViewControl: true,
+                zoomControl: true,
+                rotateControl: true,
+                scaleControl: true,
                 fullscreenControl: true,
                 clickableIcons: false,
             });

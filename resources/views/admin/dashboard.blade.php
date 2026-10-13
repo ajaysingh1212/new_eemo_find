@@ -5,7 +5,6 @@
     <div class="traffic-map-canvas" id="admin-traffic-map" data-api-key="{{ config('services.google_maps.api_key') }}">
         <p class="traffic-map-status" id="traffic-map-status" role="status" aria-live="polite">Loading map…</p>
     </div>
-    <span class="traffic-demo-badge"><span class="status-dot"></span> SAMPLE DATA</span>
     <div class="traffic-metrics" aria-label="GPS devices, licenses and users">
         <article class="traffic-metric device-metric">
             <div class="traffic-metric-heading"><h2>Total devices</h2><span class="traffic-metric-icon"><x-icon name="device" /></span></div>
