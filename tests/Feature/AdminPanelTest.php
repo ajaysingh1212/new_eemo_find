@@ -119,7 +119,10 @@ class AdminPanelTest extends TestCase
     {
         $admin = Admin::factory()->create(['is_super_admin' => true]);
         $this->actingAs($admin, 'admin');
-        $this->get('/admin/dashboard')->assertOk()->assertSee('A clean slate')->assertSee($admin->name)->assertSee('127.0.0.1')->assertSee('sidebar-admin-ip')->assertSee('brand-live-clock')->assertDontSee('sidebar-admin-clock')->assertSee('data-clock', false)->assertSee('data-timezone', false);
+        $this->assertNotEmpty(config('services.google_maps.api_key'));
+        $response = $this->get('/admin/dashboard');
+        $response->assertOk()->assertSee('class="auth-tech-bg"', false)->assertSee('class="auth-circuit-flow"', false)->assertSee('aria-label="GPS tracking map of India"', false)->assertSee('id="admin-traffic-map"', false)->assertSee('SAMPLE DATA')->assertSee('Total devices')->assertSee('1,284')->assertSee('1,126 active')->assertSee('158 inactive')->assertSee('User licenses')->assertSee('620')->assertSee('572 active')->assertSee('48 expired')->assertSee('Users online')->assertSee('184')->assertSee('Users offline')->assertSee('936')->assertDontSee('Ferry arrival')->assertDontSee('Train speed')->assertDontSee('Recent activity')->assertDontSee('Your account')->assertSee($admin->name)->assertSee('127.0.0.1')->assertSee('sidebar-admin-ip')->assertSee('brand-live-clock')->assertDontSee('sidebar-admin-clock')->assertSee('data-clock', false)->assertSee('data-timezone', false);
+        $this->assertStringContainsString('https://*.googleapis.com', $response->headers->get('Content-Security-Policy'));
         foreach (['profile', 'security/activity-logs', 'security/active-sessions'] as $path) {
             $this->get('/admin/'.$path)->assertOk()->assertSee('Eemo')->assertSee('My Profile')->assertSee('Activity Log')->assertSee('Active Sessions')->assertDontSee('User management');
         }

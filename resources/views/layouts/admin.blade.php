@@ -2,6 +2,33 @@
 <html lang="en">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><title>@yield('title', 'Dashboard') · Eemo-Find</title>@include('layouts.assets')<link rel="stylesheet" href="{{ asset('assets/admin-theme.css') }}"></head>
 <body class="admin-shell">
+<svg class="auth-tech-bg" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+    <defs>
+        <pattern id="auth-grid" width="48" height="48" patternUnits="userSpaceOnUse">
+            <path d="M48 0H0V48" fill="none" stroke="#4b86d8" stroke-opacity=".12" stroke-width="1" />
+        </pattern>
+        <radialGradient id="auth-radar">
+            <stop offset="0" stop-color="#398bff" stop-opacity=".2" />
+            <stop offset="1" stop-color="#398bff" stop-opacity="0" />
+        </radialGradient>
+    </defs>
+    <rect width="1440" height="900" fill="url(#auth-grid)" />
+    <circle cx="1120" cy="190" r="270" fill="url(#auth-radar)" />
+    <g class="auth-circuit" fill="none" stroke="#4388df" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M0 620h180l54-54h112l42-42h108" />
+        <path d="M1440 270h-160l-54 54h-94l-42 42h-90" />
+        <path d="M980 900v-118l64-64v-82l52-52v-88" />
+        <path d="M310 0v108l56 56v82l48 48v78" />
+        <path class="auth-circuit-flow" d="M0 620h180l54-54h112l42-42h108" />
+        <path class="auth-circuit-flow auth-circuit-flow-alt" d="M1440 270h-160l-54 54h-94l-42 42h-90" />
+    </g>
+    <g class="auth-signal">
+        <circle cx="496" cy="524" r="4" />
+        <circle cx="1000" cy="408" r="4" />
+        <circle cx="466" cy="372" r="3" />
+        <circle cx="1096" cy="584" r="3" />
+    </g>
+</svg>
 <a href="#main" class="skip-link">Skip to content</a>
 <div class="sidebar-backdrop" id="sidebar-backdrop" hidden></div>
 <aside class="sidebar" id="sidebar" aria-label="Main navigation">

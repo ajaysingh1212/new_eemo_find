@@ -66,3 +66,36 @@ if (clocks.length) {
     updateClocks();
     setInterval(updateClocks, 1000);
 }
+const trafficMap = document.getElementById('admin-traffic-map');
+if (trafficMap) {
+    const status = document.getElementById('traffic-map-status');
+    const apiKey = trafficMap.dataset.apiKey;
+    if (!apiKey) {
+        status.textContent = 'Map unavailable. Set GOOGLE_MAPS_API_KEY in your .env file.';
+    } else {
+        window.initAdminTrafficMap = () => {
+            const center = { lat: 20.5937, lng: 78.9629 };
+            new google.maps.Map(trafficMap, {
+                center,
+                zoom: 5,
+                mapTypeControl: false,
+                streetViewControl: false,
+                fullscreenControl: true,
+                clickableIcons: false,
+            });
+            status.remove();
+        };
+        const script = document.createElement('script');
+        const params = new URLSearchParams({
+            key: apiKey,
+            callback: 'initAdminTrafficMap',
+            loading: 'async',
+        });
+        script.src = `https://maps.googleapis.com/maps/api/js?${params}`;
+        script.async = true;
+        script.onerror = () => {
+            status.textContent = 'Map failed to load. Check the Google Maps API key and enabled APIs.';
+        };
+        document.head.append(script);
+    }
+}

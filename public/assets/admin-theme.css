@@ -14,6 +14,52 @@ body.admin-shell {
         radial-gradient(ellipse at 8% 100%, rgba(137, 95, 255, .06), transparent 30%),
         var(--bg);
     color: var(--text);
+    isolation: isolate;
+    min-height: 100vh;
+}
+
+.admin-shell .auth-tech-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: .56;
+    animation: techDrift 24s ease-in-out infinite alternate;
+}
+
+.admin-shell .auth-circuit {
+    stroke-width: 1.5;
+    opacity: .72;
+}
+
+.admin-shell .auth-circuit-flow {
+    stroke: #168cff;
+    stroke-width: 3;
+    stroke-dasharray: 2 10;
+    animation: signalFlow 5s linear infinite;
+    opacity: .9;
+}
+
+.admin-shell .auth-circuit-flow-alt {
+    stroke: #a33dff;
+    animation-duration: 7s;
+}
+
+.admin-shell .auth-signal circle {
+    fill: #00a6ff;
+    filter: drop-shadow(0 0 7px #008cff);
+}
+
+.admin-shell .auth-signal circle:nth-child(even) {
+    fill: #9b4dff;
+    filter: drop-shadow(0 0 7px #9b4dff);
+}
+
+.admin-shell > .main-shell {
+    position: relative;
+    z-index: 1;
 }
 
 .admin-shell button:focus-visible,
@@ -153,6 +199,204 @@ body.admin-shell {
 .admin-shell .topbar-search button:hover {
     color: #114ea7;
     background: #e2efff;
+}
+
+.traffic-map {
+    position: relative;
+    min-height: 560px;
+    overflow: hidden;
+    border: 1px solid #d7e6f8;
+    border-radius: 20px;
+    background: #dcecf6;
+    box-shadow: 0 12px 32px rgba(32, 88, 170, .12);
+}
+
+.traffic-map-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.traffic-map-status {
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    z-index: 1;
+    max-width: calc(100% - 36px);
+    padding: 10px 14px;
+    border-radius: 10px;
+    color: #28476e;
+    background: #ffffff;
+    box-shadow: 0 3px 12px rgba(20, 44, 74, .14);
+    font-size: 13px;
+}
+
+.traffic-demo-badge {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 12px;
+    border: 1px solid #dfe9f8;
+    border-radius: 20px;
+    color: #526b87;
+    background: #ffffff;
+    box-shadow: 0 3px 12px rgba(20, 44, 74, .12);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .8px;
+}
+
+.traffic-demo-badge .status-dot {
+    background: #e7a900;
+    box-shadow: 0 0 0 3px rgba(231, 169, 0, .12);
+}
+
+.traffic-metrics {
+    position: absolute;
+    right: 16px;
+    bottom: 16px;
+    left: 16px;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.traffic-metric {
+    min-width: 0;
+    padding: 19px 20px 15px;
+    border: 1px solid rgba(218, 226, 236, .95);
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(25, 45, 75, .12);
+}
+
+.traffic-metric-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.traffic-metric-heading h2 {
+    overflow: hidden;
+    color: #68778c;
+    font-size: 13px;
+    font-weight: 650;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.traffic-metric-icon {
+    display: grid;
+    width: 46px;
+    height: 46px;
+    flex: none;
+    place-items: center;
+    border-radius: 7px;
+    color: #2879ff;
+    background: #e4f0ff;
+}
+
+.traffic-metric-icon .icon {
+    width: 27px;
+    height: 27px;
+}
+
+.traffic-metric-value {
+    display: block;
+    min-height: 49px;
+    color: #2879ff;
+    font-size: clamp(27px, 3vw, 40px);
+    font-weight: 700;
+    line-height: 1.2;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.traffic-metric-value small {
+    color: #8995a6;
+    font-size: .48em;
+    font-weight: 500;
+}
+
+.traffic-metric > p {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 34px;
+    padding-top: 10px;
+    border-top: 1px solid #e3e9f1;
+    color: #78869a;
+    font-size: 11px;
+}
+
+.metric-detail {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+}
+
+.metric-trend {
+    font-size: 18px;
+    line-height: 1;
+}
+
+.metric-trend.up {
+    color: #20b875;
+}
+
+.metric-trend.down {
+    color: #ff4d58;
+}
+
+.metric-trend.neutral {
+    color: #96a2b2;
+}
+
+.device-metric .traffic-metric-value,
+.device-metric .traffic-metric-icon {
+    color: #3980ef;
+}
+
+.device-metric .traffic-metric-icon {
+    background: #e2edff;
+}
+
+.license-metric .traffic-metric-value,
+.license-metric .traffic-metric-icon {
+    color: #7046ef;
+}
+
+.license-metric .traffic-metric-icon {
+    background: #eee8ff;
+}
+
+.online-metric .traffic-metric-value,
+.online-metric .traffic-metric-icon {
+    color: #17a66a;
+}
+
+.online-metric .traffic-metric-icon {
+    background: #e2f7ed;
+}
+
+.offline-metric .traffic-metric-value,
+.offline-metric .traffic-metric-icon {
+    color: #e09320;
+}
+
+.offline-metric .traffic-metric-icon {
+    background: #fff2dc;
 }
 
 .admin-shell .page-heading h1 {
@@ -428,4 +672,68 @@ body.admin-shell {
 .admin-shell dialog::backdrop,
 .admin-shell .sidebar-backdrop {
     background: rgba(17, 46, 86, .48);
+}
+
+@media (max-width: 1100px) {
+    .traffic-map {
+        min-height: 650px;
+    }
+
+    .traffic-metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+}
+
+@media (max-width: 650px) {
+    .traffic-map {
+        min-height: 690px;
+        border-radius: 15px;
+    }
+
+    .traffic-metrics {
+        right: 9px;
+        bottom: 9px;
+        left: 9px;
+        gap: 8px;
+    }
+
+    .traffic-metric {
+        padding: 12px 11px 10px;
+        border-radius: 10px;
+    }
+
+    .traffic-metric-heading {
+        margin-bottom: 6px;
+    }
+
+    .traffic-metric-heading h2 {
+        font-size: 10px;
+    }
+
+    .traffic-metric-icon {
+        width: 32px;
+        height: 32px;
+    }
+
+    .traffic-metric-icon .icon {
+        width: 20px;
+        height: 20px;
+    }
+
+    .traffic-metric-value {
+        min-height: 37px;
+        font-size: clamp(23px, 7vw, 32px);
+    }
+
+    .traffic-metric > p {
+        gap: 5px;
+        min-height: 37px;
+        padding-top: 7px;
+        font-size: 9px;
+    }
+
+    .metric-detail {
+        gap: 3px;
+    }
 }
