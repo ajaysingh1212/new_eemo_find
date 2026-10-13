@@ -192,6 +192,29 @@ body.admin-shell {
     color: #8498b3;
 }
 
+.admin-shell .admin-only {
+    font-size: 12px;
+}
+
+.admin-shell .admin-only .status-dot {
+    width: 8px;
+    height: 8px;
+    animation: realtime-status-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes realtime-status-pulse {
+    0%,
+    100% {
+        box-shadow: 0 0 0 4px rgba(53, 168, 121, .12);
+        opacity: 1;
+    }
+
+    50% {
+        box-shadow: 0 0 0 8px rgba(53, 168, 121, .2);
+        opacity: .65;
+    }
+}
+
 .admin-shell .topbar-divider {
     background: #dfe9f8;
 }
@@ -694,6 +717,12 @@ body.admin-shell {
 .admin-shell dialog::backdrop,
 .admin-shell .sidebar-backdrop {
     background: rgba(17, 46, 86, .48);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .admin-shell .admin-only .status-dot {
+        animation: none;
+    }
 }
 
 @media (max-width: 1100px) {
