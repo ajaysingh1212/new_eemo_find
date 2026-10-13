@@ -1,0 +1,433 @@
+body.admin-shell {
+    --bg: #f3f7ff;
+    --sidebar: #f8fbff;
+    --panel: #ffffff;
+    --border: #dfe9f8;
+    --text: #142c4a;
+    --muted: #61758f;
+    --purple: #1c6ad0;
+    --violet: #175ad3;
+    --green: #35a879;
+    color-scheme: light;
+    background:
+        radial-gradient(ellipse at 92% 0%, rgba(81, 157, 255, .09), transparent 32%),
+        radial-gradient(ellipse at 8% 100%, rgba(137, 95, 255, .06), transparent 30%),
+        var(--bg);
+    color: var(--text);
+}
+
+.admin-shell button:focus-visible,
+.admin-shell a:focus-visible,
+.admin-shell input:focus-visible,
+.admin-shell select:focus-visible {
+    outline-color: #4388f5;
+}
+
+.admin-shell .sidebar {
+    background: rgba(248, 251, 255, .96);
+    border-color: #dfe9f8;
+}
+
+.admin-shell .brand-symbol {
+    color: #ffffff;
+    background: linear-gradient(140deg, #2879ff, #7046ef);
+    border-color: #78aaff;
+    box-shadow: 0 6px 20px rgba(48, 112, 217, .2);
+}
+
+.admin-shell .brand-text,
+.admin-shell .brand-text > span {
+    color: #142c4a;
+}
+
+.admin-shell .brand-text small,
+.admin-shell .workspace-label {
+    color: #7185a0;
+}
+
+.admin-shell .nav-label {
+    color: #8498b3;
+}
+
+.admin-shell .nav-link {
+    color: #61758f;
+}
+
+.admin-shell .nav-link:hover {
+    background: #eaf3ff;
+    color: #174f9d;
+}
+
+.admin-shell .nav-link.active {
+    color: #175ad3;
+    background: linear-gradient(90deg, rgba(40, 121, 255, .12), rgba(112, 70, 239, .06));
+    border-color: rgba(67, 136, 245, .17);
+}
+
+.admin-shell .nav-link.active:before {
+    background: linear-gradient(180deg, #2879ff, #7046ef);
+}
+
+.admin-shell .section-active {
+    color: #174f9d;
+}
+
+.admin-shell .submenu {
+    border-color: #d7e4f6;
+}
+
+.admin-shell .private-note {
+    color: #f3f8ff;
+    background: linear-gradient(135deg, #101f3d, #143a68 58%, #1f5bb4);
+    border-color: #3169b2;
+}
+
+.admin-shell .private-note > .icon {
+    color: #bfe7ff;
+}
+
+.admin-shell .private-note p {
+    color: #c5d9f2;
+}
+
+.admin-shell .sidebar-admin {
+    border-color: #dfe9f8;
+}
+
+.admin-shell .avatar {
+    color: #ffffff;
+    background: linear-gradient(135deg, #3a8dff, #7046ef);
+    border-color: #8ab8ff;
+}
+
+.admin-shell .avatar-large {
+    color: #174f9d;
+    background: linear-gradient(145deg, #edf7ff, #8ec5ff);
+    border-color: #c2ddff;
+}
+
+.admin-shell .topbar {
+    background: rgba(255, 255, 255, .88);
+    border-color: #dfe9f8;
+    box-shadow: 0 5px 22px rgba(32, 88, 170, .06);
+}
+
+.admin-shell .icon-button {
+    color: #61758f;
+}
+
+.admin-shell .icon-button:hover {
+    color: #175ad3;
+    background: #eaf3ff;
+}
+
+.admin-shell .breadcrumbs [aria-current] {
+    color: #28476e;
+}
+
+.admin-shell .separator,
+.admin-shell .admin-only {
+    color: #8498b3;
+}
+
+.admin-shell .topbar-divider {
+    background: #dfe9f8;
+}
+
+.admin-shell .topbar-search {
+    color: #6f86a3;
+    background: #f3f8ff;
+    border-color: #dfeaff;
+}
+
+.admin-shell .topbar-search input {
+    color: #18324d;
+}
+
+.admin-shell .topbar-search input::placeholder {
+    color: #8ba0bb;
+}
+
+.admin-shell .topbar-search button {
+    color: #1c6ad0;
+}
+
+.admin-shell .topbar-search button:hover {
+    color: #114ea7;
+    background: #e2efff;
+}
+
+.admin-shell .page-heading h1 {
+    color: #142c4a;
+}
+
+.admin-shell .eyebrow,
+.admin-shell .page-heading p {
+    color: #7185a0;
+}
+
+.admin-shell .heading-dot,
+.admin-shell .date-chip .icon {
+    color: #1c6ad0;
+}
+
+.admin-shell .date-chip {
+    color: #59718a;
+    background: rgba(255, 255, 255, .85);
+    border-color: #dfeaff;
+    box-shadow: 0 3px 12px rgba(32, 88, 170, .04);
+}
+
+.admin-shell .pill {
+    color: #245b9f;
+    background: #edf5ff;
+    border-color: #d7e8ff;
+}
+
+.admin-shell .welcome-card {
+    color: #ffffff;
+    background: linear-gradient(125deg, #101f3d 0%, #143a68 32%, #1f5bb4 75%, #287de0 100%);
+    border-color: #3169b2;
+    box-shadow: 0 12px 30px rgba(32, 88, 170, .18);
+}
+
+.admin-shell .welcome-card:after {
+    border-color: rgba(191, 231, 255, .16);
+}
+
+.admin-shell .welcome-copy h2 {
+    color: #f3f8ff;
+}
+
+.admin-shell .welcome-copy p {
+    color: rgba(226, 239, 255, .84);
+}
+
+.admin-shell .welcome-copy .pill {
+    color: #dceeff;
+    background: rgba(211, 239, 255, .1);
+    border-color: rgba(191, 221, 255, .22);
+}
+
+.admin-shell .welcome-copy .text-link {
+    color: #bfe7ff;
+}
+
+.admin-shell .quick-card,
+.admin-shell .card {
+    color: var(--text);
+    background: rgba(255, 255, 255, .94);
+    border-color: #dfe9f8;
+    box-shadow: 0 5px 20px rgba(32, 88, 170, .045);
+}
+
+.admin-shell .quick-card:hover {
+    background: #ffffff;
+    border-color: #a9ccff;
+    box-shadow: 0 10px 28px rgba(32, 88, 170, .1);
+}
+
+.admin-shell .tile-icon {
+    color: #1c6ad0;
+    background: linear-gradient(135deg, #edf5ff, #dfeeff);
+    border-color: #d3e5ff;
+}
+
+.admin-shell .tile-icon.teal {
+    color: #7046ef;
+    background: linear-gradient(135deg, #f3efff, #e8e0ff);
+    border-color: #dfd3ff;
+}
+
+.admin-shell .tile-icon.neutral {
+    color: #61758f;
+    background: #f2f6fc;
+    border-color: #e1eaf6;
+}
+
+.admin-shell .quick-number {
+    color: #9aabc1;
+}
+
+.admin-shell .quick-link,
+.admin-shell .text-link {
+    color: #1c6ad0;
+}
+
+.admin-shell .quick-link {
+    border-color: #e2ebf8;
+}
+
+.admin-shell .activity-row,
+.admin-shell .form-footer,
+.admin-shell .account-details > div,
+.admin-shell .detail-list > div,
+.admin-shell .device-row {
+    border-color: #e4edf9;
+}
+
+.admin-shell .activity-row strong,
+.admin-shell .account-identity strong {
+    color: #28476e;
+}
+
+.admin-shell .activity-icon {
+    color: #1c6ad0;
+    background: #edf5ff;
+    border-color: #d7e8ff;
+}
+
+.admin-shell .activity-row time,
+.admin-shell .workspace-note,
+.admin-shell .footer,
+.admin-shell .card-heading p,
+.admin-shell .photo-preview p,
+.admin-shell .activity-row small {
+    color: #7185a0;
+}
+
+.admin-shell .footer {
+    border-color: #dfe9f8;
+}
+
+.admin-shell .footer-dot {
+    color: #8ba0bb;
+}
+
+.admin-shell .profile-banner {
+    background: linear-gradient(110deg, #edf5ff, #f8fbff);
+    border-color: #d7e6f8;
+}
+
+.admin-shell .profile-banner h2 {
+    color: #183c64;
+}
+
+.admin-shell .field label {
+    color: #28476e;
+}
+
+.admin-shell .input {
+    color: #18324d;
+    background: linear-gradient(180deg, #ffffff, #f4f9ff);
+    border-color: #dfeaff;
+    border-radius: 15px;
+}
+
+.admin-shell .input::placeholder {
+    color: #8ba0bb;
+}
+
+.admin-shell .input:hover {
+    border-color: #bfd7ff;
+}
+
+.admin-shell .input:focus {
+    border-color: #4f8ef7;
+    box-shadow: 0 0 0 4px rgba(79, 142, 247, .12);
+}
+
+.admin-shell input[type=file]::file-selector-button {
+    color: #245b9f;
+    background: #edf5ff;
+    border-color: #d3e5ff;
+}
+
+.admin-shell .btn-primary {
+    color: #ffffff;
+    background: linear-gradient(135deg, #3a8dff, #175ad3);
+    border-color: rgba(35, 97, 209, .7);
+    box-shadow: 0 12px 26px rgba(58, 116, 222, .2);
+}
+
+.admin-shell .btn-primary:hover {
+    background: linear-gradient(135deg, #2d82ff, #0f4dbe);
+    box-shadow: 0 14px 30px rgba(58, 116, 222, .28);
+}
+
+.admin-shell .btn-secondary {
+    color: #245b9f;
+    background: #ffffff;
+    border-color: #cbdcf2;
+}
+
+.admin-shell .btn-secondary:hover {
+    background: #edf5ff;
+    border-color: #a9ccff;
+}
+
+.admin-shell .btn-ghost {
+    color: #1c6ad0;
+}
+
+.admin-shell .btn-ghost:hover {
+    color: #114ea7;
+    background: #edf5ff;
+}
+
+.admin-shell .inline-note {
+    background: #f2f7ff;
+    border-color: #dce9fb;
+}
+
+.admin-shell .inline-note .icon {
+    color: #1c6ad0;
+}
+
+.admin-shell .inline-note p {
+    color: #61758f;
+}
+
+.admin-shell .branding-preview {
+    background: #f5f9ff;
+    border-color: #d7e6f8;
+}
+
+.admin-shell .filter-form {
+    border-color: #dfe9f8;
+}
+
+.admin-shell thead {
+    background: #f1f6ff;
+}
+
+.admin-shell th {
+    color: #7185a0;
+}
+
+.admin-shell td {
+    color: #526b87;
+    border-color: #e4edf9;
+}
+
+.admin-shell tbody tr:hover {
+    background: #f7faff;
+}
+
+.admin-shell .event-badge {
+    color: #245b9f;
+    background: #edf5ff;
+    border-color: #d7e8ff;
+}
+
+.admin-shell .cell-description,
+.admin-shell .mono,
+.admin-shell .detail-list dt {
+    color: #7185a0;
+}
+
+.admin-shell pre {
+    color: #315e91;
+}
+
+.admin-shell dialog {
+    color: #18324d;
+    background: #ffffff;
+    border-color: #d7e6f8;
+    box-shadow: 0 20px 70px rgba(32, 88, 170, .2);
+}
+
+.admin-shell dialog::backdrop,
+.admin-shell .sidebar-backdrop {
+    background: rgba(17, 46, 86, .48);
+}

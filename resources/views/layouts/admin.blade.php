@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><title>@yield('title', 'Dashboard') · Eemo-Find</title>@include('layouts.assets')</head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><title>@yield('title', 'Dashboard') · Eemo-Find</title>@include('layouts.assets')<link rel="stylesheet" href="{{ asset('assets/admin-theme.css') }}"></head>
 <body class="admin-shell">
 <a href="#main" class="skip-link">Skip to content</a>
 <div class="sidebar-backdrop" id="sidebar-backdrop" hidden></div>
