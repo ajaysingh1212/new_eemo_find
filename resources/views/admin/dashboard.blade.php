@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 @section('title', 'Dashboard')
 @section('content')
-<div class="page-heading"><div><span class="eyebrow">YOUR WORKSPACE AT A GLANCE</span><h1>Dashboard<span class="heading-dot">.</span></h1><p>A little clarity. A lot of control.</p></div><div class="date-chip"><x-icon name="clock" /><time data-clock data-timezone="{{ config('app.timezone') }}" datetime="{{ now()->toIso8601String() }}">{{ now()->format('D, d M Y · H:i') }} {{ config('app.timezone') }}</time></div></div>
+<div class="page-heading"><div><span class="eyebrow">YOUR WORKSPACE AT A GLANCE</span><h1>Dashboard<span class="heading-dot">.</span></h1><p>A little clarity. A lot of control.</p></div><div class="date-chip"><x-icon name="clock" /><time data-clock data-timezone="{{ config('app.timezone') }}" datetime="{{ now()->toIso8601String() }}">{{ now()->format('d M Y H:i:s') }}</time></div></div>
 <div class="dashboard-overview">
 <section class="welcome-card">
 <div class="welcome-copy"><span class="pill"><span class="status-dot"></span> You’re securely signed in</span><h2>Welcome back, {{ auth('admin')->user()->name }}.</h2><p>This is your space to manage your profile, review your activity,<br class="desktop-break"> and keep your account secure.</p><a class="text-link" href="{{ route('admin.profile') }}">Make yourself at home <x-icon name="arrow" /></a></div>

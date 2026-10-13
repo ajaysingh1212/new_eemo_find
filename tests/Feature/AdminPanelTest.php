@@ -119,7 +119,7 @@ class AdminPanelTest extends TestCase
     {
         $admin = Admin::factory()->create(['is_super_admin' => true]);
         $this->actingAs($admin, 'admin');
-        $this->get('/admin/dashboard')->assertOk()->assertSee('A clean slate')->assertSee($admin->name)->assertSee('data-clock', false);
+        $this->get('/admin/dashboard')->assertOk()->assertSee('A clean slate')->assertSee($admin->name)->assertSee('127.0.0.1')->assertSee('sidebar-admin-ip')->assertSee('brand-live-clock')->assertDontSee('sidebar-admin-clock')->assertSee('data-clock', false)->assertSee('data-timezone', false);
         foreach (['profile', 'security/activity-logs', 'security/active-sessions'] as $path) {
             $this->get('/admin/'.$path)->assertOk()->assertSee('Eemo')->assertSee('My Profile')->assertSee('Activity Log')->assertSee('Active Sessions')->assertDontSee('User management');
         }

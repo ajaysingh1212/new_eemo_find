@@ -45,6 +45,14 @@ body.admin-shell {
     color: #7185a0;
 }
 
+.admin-shell .brand-text .brand-live-clock {
+    margin-top: 7px;
+    font-size: 10px;
+    letter-spacing: .2px;
+    font-variant-numeric: tabular-nums;
+    text-transform: none;
+}
+
 .admin-shell .nav-label {
     color: #8498b3;
 }
@@ -76,20 +84,6 @@ body.admin-shell {
     border-color: #d7e4f6;
 }
 
-.admin-shell .private-note {
-    color: #f3f8ff;
-    background: linear-gradient(135deg, #101f3d, #143a68 58%, #1f5bb4);
-    border-color: #3169b2;
-}
-
-.admin-shell .private-note > .icon {
-    color: #bfe7ff;
-}
-
-.admin-shell .private-note p {
-    color: #c5d9f2;
-}
-
 .admin-shell .sidebar-admin {
     border-color: #dfe9f8;
 }
@@ -107,7 +101,11 @@ body.admin-shell {
 }
 
 .admin-shell .topbar {
-    background: rgba(255, 255, 255, .88);
+    position: sticky;
+    top: 8px;
+    z-index: 20;
+    flex-shrink: 0;
+    background: #ffffff;
     border-color: #dfe9f8;
     box-shadow: 0 5px 22px rgba(32, 88, 170, .06);
 }

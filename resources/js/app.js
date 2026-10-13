@@ -54,13 +54,15 @@ document.querySelectorAll('form[data-confirm]').forEach(form => {
 });
 document.getElementById('confirm-cancel')?.addEventListener('click', () => dialog.close());
 document.getElementById('confirm-accept')?.addEventListener('click', () => { dialog.close(); pendingForm?.submit(); });
-const clock = document.querySelector('[data-clock]');
-if (clock) {
-    const start = Date.parse(clock.dateTime);
+const clocks = document.querySelectorAll('[data-clock]');
+if (clocks.length) {
     const loaded = Date.now();
-    const updateClock = () => {
-        clock.textContent = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: clock.dataset.timezone }).format(new Date(start + Date.now() - loaded)) + ' ' + clock.dataset.timezone;
+    const updateClocks = () => {
+        clocks.forEach(clock => {
+            const start = Date.parse(clock.dateTime);
+            clock.textContent = new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23', timeZone: clock.dataset.timezone }).format(new Date(start + Date.now() - loaded)).replace(',', '');
+        });
     };
-    updateClock();
-    setInterval(updateClock, 30000);
+    updateClocks();
+    setInterval(updateClocks, 1000);
 }

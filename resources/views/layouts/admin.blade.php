@@ -6,7 +6,6 @@
 <div class="sidebar-backdrop" id="sidebar-backdrop" hidden></div>
 <aside class="sidebar" id="sidebar" aria-label="Main navigation">
 <div class="sidebar-brand"><x-brand /></div>
-<div class="workspace-label"><span class="status-dot"></span> Administrator workspace</div>
 <div class="nav-label">WORKSPACE</div>
 <nav class="nav">
 <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" @if(request()->routeIs('admin.dashboard')) aria-current="page" @endif><x-icon name="grid" /><span>Dashboard</span></a>
@@ -17,8 +16,7 @@
 <a href="{{ route('admin.security.active-sessions.index') }}" class="nav-link {{ request()->routeIs('admin.security.active-sessions.*') ? 'active' : '' }}" @if(request()->routeIs('admin.security.active-sessions.*')) aria-current="page" @endif><x-icon name="device" /><span>Active Sessions</span></a>
 </div></nav>
 <div class="sidebar-bottom">
-<div class="private-note"><x-icon name="lock" /><div><strong>A private workspace</strong><p>Authorized administrators only.</p></div></div>
-<div class="sidebar-admin"><x-avatar :admin="auth('admin')->user()" /><div><strong>{{ auth('admin')->user()->name }}</strong><small>{{ auth('admin')->user()->is_super_admin ? 'Super Admin' : 'Administrator' }}</small></div><form method="POST" action="{{ route('admin.logout') }}">@csrf<button class="icon-button" aria-label="Sign out"><x-icon name="logout" /></button></form></div>
+<div class="sidebar-admin"><x-avatar :admin="auth('admin')->user()" /><div><strong>{{ auth('admin')->user()->name }}</strong><small>{{ auth('admin')->user()->is_super_admin ? 'Super Admin' : 'Administrator' }}</small><small class="sidebar-admin-ip" title="IP address: {{ request()->ip() ?? 'Unavailable' }}">IP {{ request()->ip() ?? 'Unavailable' }}</small></div></div>
 </div></aside>
 <div class="main-shell">
 <header class="topbar">
