@@ -33,6 +33,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::view('licence', 'admin.blank', ['title' => 'Licence'])->name('licence');
         Route::view('licence/subscription', 'admin.blank', ['title' => 'Subscription'])->name('licence.subscription');
         Route::view('licence/payments', 'admin.blank', ['title' => 'Payments'])->name('licence.payments');
+        Route::view('support', 'admin.blank', ['title' => 'Support'])->name('support');
         Route::get('profile', [ProfileController::class, 'index'])->name('profile');
         Route::patch('profile', [ProfileController::class, 'update'])->name('profile.update');
         Route::put('profile/photo', [ProfileController::class, 'photo'])->name('profile.photo.update');

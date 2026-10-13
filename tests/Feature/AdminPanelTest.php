@@ -57,7 +57,7 @@ class AdminPanelTest extends TestCase
 
     public function test_all_private_pages_redirect_guests(): void
     {
-        foreach (['dashboard', 'notifications', 'user-management/users', 'user-management/devices', 'user-management/reports', 'tracking/live-location', 'tracking/history', 'tracking/geo-fence', 'tracking/task', 'groups', 'licence', 'licence/subscription', 'licence/payments', 'profile', 'security/activity-logs', 'security/activity-logs/1', 'security/active-sessions', 'security/error-log'] as $path) {
+        foreach (['dashboard', 'notifications', 'user-management/users', 'user-management/devices', 'user-management/reports', 'tracking/live-location', 'tracking/history', 'tracking/geo-fence', 'tracking/task', 'groups', 'licence', 'licence/subscription', 'licence/payments', 'support', 'profile', 'security/activity-logs', 'security/activity-logs/1', 'security/active-sessions', 'security/error-log'] as $path) {
             $this->get('/admin/'.$path)->assertRedirect(route('admin.login'));
         }
     }
@@ -123,8 +123,8 @@ class AdminPanelTest extends TestCase
         $response = $this->get('/admin/dashboard');
         $response->assertOk()->assertSee('class="auth-tech-bg"', false)->assertSee('class="auth-circuit-flow"', false)->assertSee('aria-label="GPS tracking map of India"', false)->assertSee('id="admin-traffic-map"', false)->assertDontSee('SAMPLE DATA')->assertSee('Total devices')->assertSee('1,284')->assertSee('1,126 active')->assertSee('158 inactive')->assertSee('User licenses')->assertSee('620')->assertSee('572 active')->assertSee('48 expired')->assertSee('Users online')->assertSee('184')->assertSee('Users offline')->assertSee('936')->assertDontSee('Ferry arrival')->assertDontSee('Train speed')->assertDontSee('Recent activity')->assertDontSee('Your account')->assertSee($admin->name)->assertSee('127.0.0.1')->assertSee('sidebar-admin-ip')->assertSee('brand-live-clock')->assertDontSee('sidebar-admin-clock')->assertSee('data-clock', false)->assertSee('data-timezone', false)->assertSee('Live Now')->assertDontSee('Realtime')->assertDontSee('Admin access');
         $this->assertStringContainsString('https://*.googleapis.com', $response->headers->get('Content-Security-Policy'));
-        foreach (['profile', 'security/activity-logs', 'security/active-sessions', 'security/error-log', 'notifications', 'user-management/users', 'user-management/devices', 'user-management/reports', 'tracking/live-location', 'tracking/history', 'tracking/geo-fence', 'tracking/task', 'groups', 'licence', 'licence/subscription', 'licence/payments'] as $path) {
-            $this->get('/admin/'.$path)->assertOk()->assertSee('Eemo')->assertSee('Notification')->assertSee('User Management')->assertSee('User')->assertSee('Device')->assertSee('Reports')->assertSee('Tracking')->assertSee('Live Location')->assertSee('History')->assertSee('Geofence')->assertSee('Task')->assertSee('Group')->assertSee('Licence')->assertSee('Subscription')->assertSee('Payments')->assertSee('Admin Profile')->assertDontSee('<span>My Profile</span>', false)->assertSee('Activity Log')->assertSee('Active Sessions')->assertSee('Error Log');
+        foreach (['profile', 'security/activity-logs', 'security/active-sessions', 'security/error-log', 'notifications', 'user-management/users', 'user-management/devices', 'user-management/reports', 'tracking/live-location', 'tracking/history', 'tracking/geo-fence', 'tracking/task', 'groups', 'licence', 'licence/subscription', 'licence/payments', 'support'] as $path) {
+            $this->get('/admin/'.$path)->assertOk()->assertSee('Eemo')->assertSee('Notification')->assertSee('User Management')->assertSee('User')->assertSee('Device')->assertSee('Reports')->assertSee('Tracking')->assertSee('Live Location')->assertSee('History')->assertSee('Geofence')->assertSee('Task')->assertSee('Group')->assertSee('Licence')->assertSee('Subscription')->assertSee('Payments')->assertSee('Support')->assertSee('Admin Profile')->assertDontSee('<span>My Profile</span>', false)->assertSee('Activity Log')->assertSee('Active Sessions')->assertSee('Error Log');
         }
         $this->get('/admin/notifications')->assertSee('Notification</span>', false)->assertDontSee('<h1', false);
         $this->get('/admin/user-management/users')->assertSee('User</span>', false)->assertDontSee('<h1', false);
@@ -138,6 +138,7 @@ class AdminPanelTest extends TestCase
         $this->get('/admin/licence')->assertSee('Licence</span>', false)->assertDontSee('<h1', false);
         $this->get('/admin/licence/subscription')->assertSee('Subscription</span>', false)->assertDontSee('<h1', false);
         $this->get('/admin/licence/payments')->assertSee('Payments</span>', false)->assertDontSee('<h1', false);
+        $this->get('/admin/support')->assertSee('Support</span>', false)->assertDontSee('<h1', false);
         $this->get('/admin/security/error-log')->assertSee('Error Log</span>', false)->assertDontSee('<h1', false);
     }
 
