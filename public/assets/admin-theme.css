@@ -74,6 +74,11 @@ body.admin-shell {
     border-color: #dfe9f8;
 }
 
+.admin-shell .sidebar-bottom {
+    margin-top: auto;
+    padding: 0px 19px 18px;
+}
+
 .admin-shell .nav {
     flex: 1;
     min-height: 0;
