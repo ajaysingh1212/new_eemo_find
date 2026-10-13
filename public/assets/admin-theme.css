@@ -203,7 +203,7 @@ body.admin-shell {
 
 .traffic-map {
     position: relative;
-    min-height: 560px;
+    min-height: 460px;
     overflow: hidden;
     border: 1px solid #d7e6f8;
     border-radius: 20px;
@@ -258,22 +258,44 @@ body.admin-shell {
 
 .traffic-metrics {
     position: absolute;
-    right: 16px;
-    bottom: 16px;
-    left: 16px;
+    right: 14px;
+    bottom: 14px;
+    left: 14px;
     z-index: 2;
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 16px;
+    gap: 12px;
 }
 
 .traffic-metric {
+    position: relative;
     min-width: 0;
-    padding: 19px 20px 15px;
-    border: 1px solid rgba(218, 226, 236, .95);
-    border-radius: 12px;
-    background: #ffffff;
-    box-shadow: 0 4px 12px rgba(25, 45, 75, .12);
+    overflow: hidden;
+    padding: 14px 16px 11px;
+    border: 1px solid var(--metric-border);
+    border-radius: 14px;
+    color: #18324d;
+    background:
+        radial-gradient(circle at 100% 0, var(--metric-glow), transparent 42%),
+        linear-gradient(145deg, #ffffff, var(--metric-surface));
+    box-shadow: 0 8px 24px rgba(40, 94, 169, .09);
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.traffic-metric::before {
+    position: absolute;
+    top: 0;
+    right: 18px;
+    left: 18px;
+    height: 3px;
+    border-radius: 0 0 4px 4px;
+    background: linear-gradient(90deg, var(--metric-accent), var(--metric-secondary));
+    content: "";
+}
+
+.traffic-metric:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 30px rgba(37, 72, 119, .15);
 }
 
 .traffic-metric-heading {
@@ -281,12 +303,12 @@ body.admin-shell {
     align-items: center;
     justify-content: space-between;
     gap: 8px;
-    margin-bottom: 10px;
+    margin-bottom: 7px;
 }
 
 .traffic-metric-heading h2 {
     overflow: hidden;
-    color: #68778c;
+    color: #61758f;
     font-size: 13px;
     font-weight: 650;
     text-overflow: ellipsis;
@@ -296,25 +318,27 @@ body.admin-shell {
 
 .traffic-metric-icon {
     display: grid;
-    width: 46px;
-    height: 46px;
+    width: 40px;
+    height: 40px;
     flex: none;
     place-items: center;
-    border-radius: 7px;
-    color: #2879ff;
-    background: #e4f0ff;
+    border-radius: 11px;
+    color: var(--metric-accent);
+    background: linear-gradient(145deg, #ffffff, var(--metric-icon-bg));
+    border: 1px solid var(--metric-border);
+    box-shadow: 0 4px 12px var(--metric-shadow);
 }
 
 .traffic-metric-icon .icon {
-    width: 27px;
-    height: 27px;
+    width: 23px;
+    height: 23px;
 }
 
 .traffic-metric-value {
     display: block;
-    min-height: 49px;
-    color: #2879ff;
-    font-size: clamp(27px, 3vw, 40px);
+    min-height: 42px;
+    color: var(--metric-accent);
+    font-size: clamp(25px, 2.6vw, 34px);
     font-weight: 700;
     line-height: 1.2;
     font-variant-numeric: tabular-nums;
@@ -322,7 +346,7 @@ body.admin-shell {
 }
 
 .traffic-metric-value small {
-    color: #8995a6;
+    color: #8492a7;
     font-size: .48em;
     font-weight: 500;
 }
@@ -331,11 +355,11 @@ body.admin-shell {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
-    min-height: 34px;
-    padding-top: 10px;
-    border-top: 1px solid #e3e9f1;
-    color: #78869a;
+    gap: 7px;
+    min-height: 30px;
+    padding-top: 7px;
+    border-top: 1px solid var(--metric-border);
+    color: #6e7d92;
     font-size: 11px;
 }
 
@@ -363,40 +387,44 @@ body.admin-shell {
     color: #96a2b2;
 }
 
-.device-metric .traffic-metric-value,
-.device-metric .traffic-metric-icon {
-    color: #3980ef;
+.device-metric {
+    --metric-accent: #2879e8;
+    --metric-secondary: #55b8ff;
+    --metric-surface: #f1f7ff;
+    --metric-border: #d9e8fb;
+    --metric-icon-bg: #dcecff;
+    --metric-glow: rgba(73, 143, 255, .18);
+    --metric-shadow: rgba(40, 121, 232, .12);
 }
 
-.device-metric .traffic-metric-icon {
-    background: #e2edff;
+.license-metric {
+    --metric-accent: #8151dc;
+    --metric-secondary: #bd83ff;
+    --metric-surface: #f7f3ff;
+    --metric-border: #e7dcfb;
+    --metric-icon-bg: #eee5ff;
+    --metric-glow: rgba(129, 81, 220, .18);
+    --metric-shadow: rgba(129, 81, 220, .12);
 }
 
-.license-metric .traffic-metric-value,
-.license-metric .traffic-metric-icon {
-    color: #7046ef;
+.online-metric {
+    --metric-accent: #168cff;
+    --metric-secondary: #55d4ed;
+    --metric-surface: #effaff;
+    --metric-border: #d6effa;
+    --metric-icon-bg: #d9f4ff;
+    --metric-glow: rgba(22, 140, 255, .16);
+    --metric-shadow: rgba(22, 140, 255, .12);
 }
 
-.license-metric .traffic-metric-icon {
-    background: #eee8ff;
-}
-
-.online-metric .traffic-metric-value,
-.online-metric .traffic-metric-icon {
-    color: #17a66a;
-}
-
-.online-metric .traffic-metric-icon {
-    background: #e2f7ed;
-}
-
-.offline-metric .traffic-metric-value,
-.offline-metric .traffic-metric-icon {
-    color: #e09320;
-}
-
-.offline-metric .traffic-metric-icon {
-    background: #fff2dc;
+.offline-metric {
+    --metric-accent: #5c63dc;
+    --metric-secondary: #9b75f5;
+    --metric-surface: #f3f4ff;
+    --metric-border: #dfe1fb;
+    --metric-icon-bg: #e5e7ff;
+    --metric-glow: rgba(92, 99, 220, .16);
+    --metric-shadow: rgba(92, 99, 220, .12);
 }
 
 .admin-shell .page-heading h1 {
@@ -676,7 +704,7 @@ body.admin-shell {
 
 @media (max-width: 1100px) {
     .traffic-map {
-        min-height: 650px;
+        min-height: 540px;
     }
 
     .traffic-metrics {
@@ -687,7 +715,7 @@ body.admin-shell {
 
 @media (max-width: 650px) {
     .traffic-map {
-        min-height: 690px;
+        min-height: 580px;
         border-radius: 15px;
     }
 
@@ -699,7 +727,7 @@ body.admin-shell {
     }
 
     .traffic-metric {
-        padding: 12px 11px 10px;
+        padding: 10px 9px 8px;
         border-radius: 10px;
     }
 
@@ -712,24 +740,24 @@ body.admin-shell {
     }
 
     .traffic-metric-icon {
-        width: 32px;
-        height: 32px;
+        width: 28px;
+        height: 28px;
     }
 
     .traffic-metric-icon .icon {
-        width: 20px;
-        height: 20px;
+        width: 18px;
+        height: 18px;
     }
 
     .traffic-metric-value {
-        min-height: 37px;
-        font-size: clamp(23px, 7vw, 32px);
+        min-height: 32px;
+        font-size: clamp(21px, 6vw, 28px);
     }
 
     .traffic-metric > p {
         gap: 5px;
-        min-height: 37px;
-        padding-top: 7px;
+        min-height: 32px;
+        padding-top: 6px;
         font-size: 9px;
     }
 
