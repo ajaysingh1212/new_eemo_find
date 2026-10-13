@@ -1,6 +1,6 @@
 body.admin-shell {
-    --bg: #f3f7ff;
-    --sidebar: #f8fbff;
+    --bg: #f3f1ff;
+    --sidebar: #f8f5ff;
     --panel: #ffffff;
     --border: #dfe9f8;
     --text: #142c4a;
@@ -10,8 +10,10 @@ body.admin-shell {
     --green: #35a879;
     color-scheme: light;
     background:
-        radial-gradient(ellipse at 92% 0%, rgba(81, 157, 255, .09), transparent 32%),
-        radial-gradient(ellipse at 8% 100%, rgba(137, 95, 255, .06), transparent 30%),
+        radial-gradient(ellipse at 92% 0%, rgba(81, 157, 255, .2), transparent 35%),
+        radial-gradient(ellipse at 8% 100%, rgba(219, 91, 171, .13), transparent 34%),
+        radial-gradient(ellipse at 68% 78%, rgba(51, 190, 155, .1), transparent 30%),
+        radial-gradient(ellipse at 10% 10%, rgba(255, 174, 74, .08), transparent 27%),
         var(--bg);
     color: var(--text);
     isolation: isolate;
@@ -70,8 +72,11 @@ body.admin-shell {
 }
 
 .admin-shell .sidebar {
-    background: rgba(248, 251, 255, .96);
-    border-color: #dfe9f8;
+    background:
+        radial-gradient(ellipse at 0 0, rgba(76, 139, 255, .12), transparent 42%),
+        radial-gradient(ellipse at 100% 58%, rgba(202, 112, 226, .09), transparent 44%),
+        linear-gradient(180deg, rgba(252, 249, 255, .99), rgba(244, 249, 255, .99));
+    border-color: #e2dcf4;
 }
 
 .admin-shell .sidebar-bottom {
@@ -127,34 +132,94 @@ body.admin-shell {
 }
 
 .admin-shell .nav-link {
-    color: #61758f;
+    color: #526b89;
 }
 
 .admin-shell .nav-link:hover {
-    background: #eaf3ff;
+    background: linear-gradient(100deg, #e5f0ff, #f0eaff);
     color: #174f9d;
+}
+
+.admin-shell .nav-link > .icon {
+    color: #347ee6;
+}
+
+.admin-shell .nav-link.tone-blue {
+    --nav-tone: #3477e2;
+    --nav-wash: #e9f1ff;
+    --nav-border: #d4e3ff;
+}
+
+.admin-shell .nav-link.tone-violet {
+    --nav-tone: #8050d5;
+    --nav-wash: #f1eaff;
+    --nav-border: #e4d6ff;
+}
+
+.admin-shell .nav-link.tone-teal {
+    --nav-tone: #118f88;
+    --nav-wash: #e3f8f3;
+    --nav-border: #c8ede3;
+}
+
+.admin-shell .nav-link.tone-cyan {
+    --nav-tone: #168db7;
+    --nav-wash: #e3f6fc;
+    --nav-border: #c9eaf5;
+}
+
+.admin-shell .nav-link.tone-amber {
+    --nav-tone: #bd7813;
+    --nav-wash: #fff4df;
+    --nav-border: #f3dfb9;
+}
+
+.admin-shell .nav-link.tone-green {
+    --nav-tone: #27834e;
+    --nav-wash: #e8f7e9;
+    --nav-border: #cfead1;
+}
+
+.admin-shell .nav-link.tone-rose {
+    --nav-tone: #c34775;
+    --nav-wash: #ffedf3;
+    --nav-border: #f5d4e1;
+}
+
+.admin-shell .nav-link[class*="tone-"] > .icon {
+    color: var(--nav-tone);
+}
+
+.admin-shell .nav-link[class*="tone-"]:hover {
+    color: var(--nav-tone);
+    background: var(--nav-wash);
 }
 
 .admin-shell .nav-link.active {
-    color: #175ad3;
-    background: linear-gradient(90deg, rgba(40, 121, 255, .12), rgba(112, 70, 239, .06));
-    border-color: rgba(67, 136, 245, .17);
+    color: var(--nav-tone, #174fbd);
+    background: linear-gradient(100deg, var(--nav-wash, #e9f1ff), rgba(255, 255, 255, .8));
+    border-color: var(--nav-border, #d4e3ff);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .65);
 }
 
 .admin-shell .nav-link.active:before {
-    background: linear-gradient(180deg, #2879ff, #7046ef);
+    background: var(--nav-tone, #3477e2);
 }
 
 .admin-shell .section-active {
-    color: #174f9d;
+    color: var(--nav-tone, #174f9d);
+    background: linear-gradient(100deg, var(--nav-wash, #e9f1ff), rgba(255, 255, 255, .45));
 }
 
 .admin-shell .submenu {
-    border-color: #d7e4f6;
+    border-color: #c9d9f2;
 }
 
 .admin-shell .sidebar-admin {
-    border-color: #dfe9f8;
+    border-color: #d4e1f5;
+    background: linear-gradient(110deg, rgba(230, 241, 255, .82), rgba(245, 239, 255, .72));
+    border-radius: 14px;
+    padding: 13px 10px 10px;
 }
 
 .admin-shell .avatar {
@@ -174,9 +239,9 @@ body.admin-shell {
     top: 8px;
     z-index: 20;
     flex-shrink: 0;
-    background: #ffffff;
-    border-color: #dfe9f8;
-    box-shadow: 0 5px 22px rgba(32, 88, 170, .06);
+    background: linear-gradient(105deg, #ffffff 0%, #f0f6ff 40%, #f8f1ff 72%, #fff5f8 100%);
+    border-color: #e1dcf3;
+    box-shadow: 0 7px 24px rgba(91, 72, 148, .12);
 }
 
 .admin-shell .icon-button {
@@ -430,23 +495,23 @@ body.admin-shell {
 }
 
 .online-metric {
-    --metric-accent: #168cff;
-    --metric-secondary: #55d4ed;
-    --metric-surface: #effaff;
-    --metric-border: #d6effa;
-    --metric-icon-bg: #d9f4ff;
-    --metric-glow: rgba(22, 140, 255, .16);
-    --metric-shadow: rgba(22, 140, 255, .12);
+    --metric-accent: #118b73;
+    --metric-secondary: #51d6a5;
+    --metric-surface: #edfff7;
+    --metric-border: #ccefe1;
+    --metric-icon-bg: #d9f8e9;
+    --metric-glow: rgba(22, 190, 135, .18);
+    --metric-shadow: rgba(22, 160, 120, .14);
 }
 
 .offline-metric {
-    --metric-accent: #5c63dc;
-    --metric-secondary: #9b75f5;
-    --metric-surface: #f3f4ff;
-    --metric-border: #dfe1fb;
-    --metric-icon-bg: #e5e7ff;
-    --metric-glow: rgba(92, 99, 220, .16);
-    --metric-shadow: rgba(92, 99, 220, .12);
+    --metric-accent: #d35370;
+    --metric-secondary: #f58d72;
+    --metric-surface: #fff2f0;
+    --metric-border: #f5d8d5;
+    --metric-icon-bg: #ffe4df;
+    --metric-glow: rgba(239, 106, 112, .17);
+    --metric-shadow: rgba(211, 83, 112, .13);
 }
 
 .admin-shell .page-heading h1 {
@@ -478,9 +543,11 @@ body.admin-shell {
 
 .admin-shell .welcome-card {
     color: #ffffff;
-    background: linear-gradient(125deg, #101f3d 0%, #143a68 32%, #1f5bb4 75%, #287de0 100%);
-    border-color: #3169b2;
-    box-shadow: 0 12px 30px rgba(32, 88, 170, .18);
+    background:
+        radial-gradient(ellipse at 92% 14%, rgba(90, 226, 201, .34), transparent 34%),
+        linear-gradient(120deg, #28215d 0%, #4141a5 38%, #6d49c8 70%, #118f9b 125%);
+    border-color: #6556bd;
+    box-shadow: 0 14px 34px rgba(77, 63, 160, .24);
 }
 
 .admin-shell .welcome-card:after {
@@ -508,9 +575,9 @@ body.admin-shell {
 .admin-shell .quick-card,
 .admin-shell .card {
     color: var(--text);
-    background: rgba(255, 255, 255, .94);
-    border-color: #dfe9f8;
-    box-shadow: 0 5px 20px rgba(32, 88, 170, .045);
+    background: linear-gradient(145deg, rgba(255, 255, 255, .99), rgba(244, 249, 255, .98) 48%, rgba(250, 243, 255, .96));
+    border-color: #dedcf2;
+    box-shadow: 0 8px 25px rgba(88, 74, 145, .1);
 }
 
 .admin-shell .quick-card:hover {
@@ -587,8 +654,8 @@ body.admin-shell {
 }
 
 .admin-shell .profile-banner {
-    background: linear-gradient(110deg, #edf5ff, #f8fbff);
-    border-color: #d7e6f8;
+    background: linear-gradient(110deg, #e2efff 0%, #eee6ff 42%, #ffeaf2 72%, #e2faf3 100%);
+    border-color: #ddd3f3;
 }
 
 .admin-shell .profile-banner h2 {
