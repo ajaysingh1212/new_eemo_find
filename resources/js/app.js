@@ -104,3 +104,181 @@ if (trafficMap) {
         document.head.append(script);
     }
 }
+
+(() => {
+    const backdrop = document.getElementById('user-modal-backdrop');
+    const form = document.getElementById('user-form');
+    const details = document.getElementById('user-view-details');
+
+    if (!backdrop || !form || !details) return;
+
+    const fields = {
+        method: document.getElementById('user-form-method'),
+        tag: document.getElementById('user-modal-tag'),
+        title: document.getElementById('user-modal-title'),
+        subtitle: document.getElementById('user-modal-subtitle'),
+        submit: document.getElementById('user-submit-button'),
+        submitLabel: document.getElementById('user-submit-label'),
+        cancel: document.getElementById('user-cancel-button'),
+        name: document.getElementById('user-name'),
+        email: document.getElementById('user-email'),
+        phone: document.getElementById('user-phone'),
+        password: document.getElementById('user-password'),
+        passwordRequiredMark: document.getElementById('password-required-mark'),
+        status: document.getElementById('user-status'),
+        statusField: document.getElementById('user-status-field'),
+        address: document.getElementById('user-address'),
+        image: document.getElementById('user-image'),
+        imagePreview: document.getElementById('user-image-preview'),
+        imageName: document.getElementById('user-image-name'),
+        viewImage: document.getElementById('view-user-image'),
+        viewInitials: document.getElementById('view-user-initials'),
+    };
+    const viewFields = {
+        name: document.getElementById('view-user-name'),
+        code: document.getElementById('view-user-code'),
+        email: document.getElementById('view-user-email'),
+        phone: document.getElementById('view-user-phone'),
+        address: document.getElementById('view-user-address'),
+        status: document.getElementById('view-user-status'),
+        lastLogin: document.getElementById('view-user-last-login'),
+    };
+    const viewEditButton = document.getElementById('view-edit-user');
+    let selectedUser = null;
+    let previewUrl = null;
+
+    const openModal = (mode, user = null) => {
+        const isCreate = mode === 'create';
+        const isView = mode === 'view';
+        if (!isCreate && !user) return;
+
+        const reopeningAfterValidation = isCreate && backdrop.hasAttribute('data-reopen-create');
+        selectedUser = user;
+        fields.tag.textContent = isCreate ? 'CREATE USER' : isView ? 'VIEW USER' : 'UPDATE USER';
+        fields.title.textContent = isCreate ? 'Register a new user' : isView ? 'User details' : 'Edit user';
+        fields.subtitle.textContent = isCreate
+            ? 'Add a user record to your registry.'
+            : isView
+                ? 'Review the registered user information.'
+                : 'Update this user’s registry information.';
+        form.hidden = isView;
+        details.hidden = !isView;
+        fields.method.value = isCreate ? 'POST' : 'PUT';
+        fields.submit.hidden = isView;
+        fields.submitLabel.textContent = isCreate ? 'Create user' : 'Save changes';
+        fields.cancel.textContent = isView ? 'Close' : 'Cancel';
+        form.action = isCreate
+            ? form.dataset.createAction
+            : form.dataset.updateActionTemplate.replace('__USER__', user.id);
+
+        if (!reopeningAfterValidation) {
+            fields.name.value = isCreate ? '' : (user.name || '');
+            fields.email.value = isCreate ? '' : (user.email || '');
+            fields.phone.value = isCreate ? '' : (user.phone || '');
+            fields.address.value = isCreate ? '' : (user.address || '');
+        }
+        fields.password.value = '';
+        fields.password.required = isCreate;
+        fields.passwordRequiredMark.hidden = !isCreate;
+        fields.password.placeholder = isCreate ? 'Enter password' : 'Leave empty to keep current password';
+        fields.statusField.hidden = isCreate || isView;
+        fields.status.disabled = isCreate || isView;
+        fields.status.required = !isCreate && !isView;
+        fields.status.value = isCreate ? 'active' : (user.status || 'active');
+        fields.image.value = '';
+        fields.name.readOnly = isView;
+        fields.email.readOnly = isView;
+        fields.phone.readOnly = isView;
+        fields.address.readOnly = isView;
+        fields.password.readOnly = isView;
+        fields.image.disabled = isView;
+        if (previewUrl) {
+            URL.revokeObjectURL(previewUrl);
+            previewUrl = null;
+        }
+        const initialImage = isCreate ? '' : (user.image || '');
+        fields.imagePreview.src = initialImage;
+        fields.imagePreview.hidden = !initialImage;
+        fields.imageName.textContent = initialImage ? 'Current profile photo' : 'Choose a profile photo';
+
+        if (isView) {
+            viewFields.name.textContent = user.name || '';
+            viewFields.code.textContent = user.code || '';
+            viewFields.email.textContent = user.email || '—';
+            viewFields.phone.textContent = user.phone || '—';
+            viewFields.address.textContent = user.address || '—';
+            viewFields.status.textContent = (user.status || 'inactive').charAt(0).toUpperCase() + (user.status || 'inactive').slice(1);
+            viewFields.lastLogin.textContent = user.lastLogin || 'Never';
+            fields.viewImage.alt = user.name ? `${user.name} profile` : 'User profile';
+            if (user.image) {
+                fields.viewImage.src = user.image;
+                fields.viewImage.hidden = false;
+                fields.viewInitials.hidden = true;
+            } else {
+                fields.viewImage.removeAttribute('src');
+                fields.viewImage.hidden = true;
+                fields.viewInitials.textContent = (user.name || 'U').trim().split(/\s+/).slice(0, 2).map(part => part.charAt(0).toUpperCase()).join('');
+                fields.viewInitials.hidden = false;
+            }
+        }
+
+        backdrop.hidden = false;
+        document.body.style.overflow = 'hidden';
+        (isView ? fields.cancel : fields.name).focus();
+    };
+
+    const closeModal = () => {
+        backdrop.hidden = true;
+        document.body.style.overflow = '';
+    };
+
+    document.querySelectorAll('[data-open-user-modal]').forEach(button => {
+        button.addEventListener('click', () => openModal('create'));
+    });
+    document.querySelectorAll('[data-close-user-modal]').forEach(button => {
+        button.addEventListener('click', closeModal);
+    });
+    document.querySelectorAll('.view-button').forEach(button => {
+        button.addEventListener('click', () => openModal('view', {
+            id: button.dataset.userId,
+            name: button.dataset.userName,
+            email: button.dataset.userEmail,
+            phone: button.dataset.userPhone,
+            address: button.dataset.userAddress,
+            status: button.dataset.userStatus,
+            code: button.dataset.userCode,
+            lastLogin: button.dataset.userLastLogin,
+            image: button.dataset.userImage,
+        }));
+    });
+    document.querySelectorAll('.edit-button').forEach(button => {
+        button.addEventListener('click', () => openModal('edit', {
+            id: button.dataset.userId,
+            name: button.dataset.userName,
+            email: button.dataset.userEmail,
+            phone: button.dataset.userPhone,
+            address: button.dataset.userAddress,
+            image: button.dataset.userImage,
+            status: button.dataset.userStatus,
+        }));
+    });
+    viewEditButton?.addEventListener('click', () => {
+        if (selectedUser) openModal('edit', selectedUser);
+    });
+    fields.image.addEventListener('change', () => {
+        const [file] = fields.image.files;
+        if (previewUrl) URL.revokeObjectURL(previewUrl);
+        previewUrl = file ? URL.createObjectURL(file) : null;
+        fields.imagePreview.src = previewUrl || (selectedUser?.image || '');
+        fields.imagePreview.hidden = !fields.imagePreview.src;
+        fields.imageName.textContent = file?.name || (selectedUser?.image ? 'Current profile photo' : 'Choose a profile photo');
+    });
+    backdrop.addEventListener('click', event => {
+        if (event.target === backdrop) closeModal();
+    });
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && !backdrop.hidden) closeModal();
+    });
+
+    if (backdrop.hasAttribute('data-reopen-create')) openModal('create');
+})();

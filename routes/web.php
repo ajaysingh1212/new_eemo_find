@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PasswordResetController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\SessionController;
+use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/admin/dashboard');
@@ -22,7 +23,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('logout', [AuthController::class, 'destroy'])->name('logout');
         Route::get('dashboard', DashboardController::class)->name('dashboard');
         Route::view('notifications', 'admin.blank', ['title' => 'Notification'])->name('notifications');
-        Route::view('user-management/users', 'admin.blank', ['title' => 'User'])->name('user-management.users');
+        Route::get('user-management/users', [UserController::class, 'index'])->name('user-management.users');
+        Route::post('user-management/users', [UserController::class, 'store'])->name('user-management.users.store');
+        Route::put('user-management/users/{user}', [UserController::class, 'update'])->name('user-management.users.update');
         Route::view('user-management/devices', 'admin.blank', ['title' => 'Device'])->name('user-management.devices');
         Route::view('user-management/reports', 'admin.blank', ['title' => 'Reports'])->name('user-management.reports');
         Route::view('tracking/live-location', 'admin.blank', ['title' => 'Live Location'])->name('tracking.live-location');

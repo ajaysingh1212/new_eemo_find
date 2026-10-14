@@ -2,11 +2,13 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
-    { /* Use the interactive admin:create command; no default credentials. */
+    {
+        User::factory()->count(8)->create();
     }
 }
