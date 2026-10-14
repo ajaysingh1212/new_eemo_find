@@ -65,7 +65,7 @@
             </div>
             <div class="auth-restriction"><x-icon name="shield" /><span>This workspace is for authorized administrators only.<br>Contact your administrator if you need access.</span></div>
         </div>
-        <footer>© {{ now()->year }} Eemo-Find. All rights reserved.</footer>
+        <footer>© {{ now()->year }} Eemo-Find. All rights reserved. Developed by <strong><a href="https://www.sanketkumarofficial.in/" target="_blank" rel="noopener noreferrer">Sanket Kumar</a></strong>.</footer>
     </main>
 </div>
 </body>
