@@ -37,7 +37,7 @@ For disposable SQLite development set DB_CONNECTION=sqlite and create an empty d
 
 ## Assets
 
-Use npm run build and php artisan serve for preview. Standalone assets in public/assets render without Node and mirror the resources CSS/JS. Synchronize copies using **php scripts/sync-assets.php** after edits. Layouts use the Vite build when its manifest exists.
+Use npm run build and php artisan serve for preview. The build creates fingerprinted Vite assets and synchronizes the standalone copies in public/assets. Layouts use Vite while its dev server is running or when a build manifest exists; otherwise, standalone CSS/JS URLs include content hashes so browsers fetch changed files without a hard refresh. If you edit assets and use the standalone fallback without rebuilding, run **php scripts/sync-assets.php**.
 
 CSP targets the production build. Vite HMR needs a local-only policy adjustment for its origin/WebSocket connection; use npm run build for preview. Do not weaken production CSP.
 

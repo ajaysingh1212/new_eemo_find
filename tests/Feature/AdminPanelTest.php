@@ -83,6 +83,24 @@ class AdminPanelTest extends TestCase
         $this->get('/admin/login')->assertRedirect(route('admin.dashboard'));
     }
 
+    public function test_standalone_asset_urls_are_fingerprinted_and_admin_theme_is_scoped(): void
+    {
+        if (file_exists(public_path('hot')) || file_exists(public_path('build/manifest.json'))) {
+            $this->markTestSkipped('The standalone asset fallback is not active.');
+        }
+
+        $this->get('/admin/login')
+            ->assertOk()
+            ->assertSee(asset('assets/app.css').'?v='.hash_file('sha256', public_path('assets/app.css')), false)
+            ->assertSee(asset('assets/app.js').'?v='.hash_file('sha256', public_path('assets/app.js')), false)
+            ->assertDontSee(asset('assets/admin-theme.css'), false);
+
+        $admin = Admin::factory()->create();
+        $this->actingAs($admin, 'admin')->get('/admin/dashboard')
+            ->assertOk()
+            ->assertSee(asset('assets/admin-theme.css').'?v='.hash_file('sha256', public_path('assets/admin-theme.css')), false);
+    }
+
     public function test_login_failure_is_generic_and_logged_without_credentials(): void
     {
         $admin = Admin::factory()->create();
