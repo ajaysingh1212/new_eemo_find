@@ -32,6 +32,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::view('tracking/history', 'admin.blank', ['title' => 'History'])->name('tracking.history');
         Route::view('tracking/geo-fence', 'admin.blank', ['title' => 'Geofence'])->name('tracking.geo-fence');
         Route::view('tracking/task', 'admin.blank', ['title' => 'Task'])->name('tracking.task');
+        Route::view('tracking/sos', 'admin.blank', ['title' => 'SOS'])->name('tracking.sos');
         Route::view('groups', 'admin.blank', ['title' => 'Group'])->name('groups');
         Route::view('licence', 'admin.blank', ['title' => 'Licence'])->name('licence');
         Route::view('licence/subscription', 'admin.blank', ['title' => 'Subscription'])->name('licence.subscription');
