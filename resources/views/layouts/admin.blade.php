@@ -41,7 +41,6 @@
 <div id="user-management-submenu" class="submenu" @if(!request()->routeIs('admin.user-management.*')) hidden @endif>
 <a href="{{ route('admin.user-management.users') }}" class="nav-link tone-teal {{ request()->routeIs('admin.user-management.users') ? 'active' : '' }}" @if(request()->routeIs('admin.user-management.users')) aria-current="page" @endif><x-icon name="user" /><span>User</span></a>
 <a href="{{ route('admin.user-management.devices') }}" class="nav-link tone-cyan {{ request()->routeIs('admin.user-management.devices') ? 'active' : '' }}" @if(request()->routeIs('admin.user-management.devices')) aria-current="page" @endif><x-icon name="device" /><span>Device</span></a>
-<a href="{{ route('admin.user-management.reports') }}" class="nav-link tone-amber {{ request()->routeIs('admin.user-management.reports') ? 'active' : '' }}" @if(request()->routeIs('admin.user-management.reports')) aria-current="page" @endif><x-icon name="activity" /><span>Reports</span></a>
 </div>
 <button class="nav-link tone-cyan submenu-toggle {{ request()->routeIs('admin.tracking.*') ? 'section-active' : '' }}" id="tracking-toggle" data-submenu-toggle="tracking-submenu" aria-controls="tracking-submenu" aria-expanded="{{ request()->routeIs('admin.tracking.*') ? 'true' : 'false' }}"><x-icon name="activity" /><span>Tracking</span><x-icon name="chevron" class="chevron" /></button>
 <div id="tracking-submenu" class="submenu" @if(!request()->routeIs('admin.tracking.*')) hidden @endif>

@@ -24,6 +24,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('dashboard', DashboardController::class)->name('dashboard');
         Route::view('notifications', 'admin.blank', ['title' => 'Notification'])->name('notifications');
         Route::get('user-management/users', [UserController::class, 'index'])->name('user-management.users');
+        Route::get('user-management/users/{user}', [UserController::class, 'show'])->name('user-management.users.show');
         Route::post('user-management/users', [UserController::class, 'store'])->name('user-management.users.store');
         Route::put('user-management/users/{user}', [UserController::class, 'update'])->name('user-management.users.update');
         Route::get('user-management/devices', [UserController::class, 'devices'])->name('user-management.devices');

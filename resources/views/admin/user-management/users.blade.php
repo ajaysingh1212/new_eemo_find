@@ -132,16 +132,7 @@
                                 data-user-address="{{ $user->address ?? '' }}"
                                 data-user-status="{{ $user->status }}"
                                 data-user-image="{{ $user->profile_image ? Storage::disk('public')->url($user->profile_image) : '' }}">Edit</button>
-                            <button type="button" class="action-button view-button"
-                                data-user-id="{{ $user->id }}"
-                                data-user-name="{{ $user->name }}"
-                                data-user-email="{{ $user->email }}"
-                                data-user-phone="{{ $user->phone }}"
-                                data-user-address="{{ $user->address ?? '' }}"
-                                data-user-status="{{ $user->status }}"
-                                data-user-code="{{ $user->user_code }}"
-                                data-user-last-login="{{ $user->last_login_at ? $user->last_login_at->format('d M Y, h:i A') : 'Never' }}"
-                                data-user-image="{{ $user->profile_image ? Storage::disk('public')->url($user->profile_image) : '' }}">View</button>
+                            <a class="action-button view-button" href="{{ route('admin.user-management.users.show', $user) }}">View</a>
                         @endif
                     </div>
                     @if ($isDevicePage)
@@ -243,27 +234,6 @@
                     <button type="submit" class="primary-button" id="user-submit-button"><span id="user-submit-label">Create {{ $recordLabel }}</span></button>
                 </div>
             </form>
-            <div class="user-view-details" id="user-view-details" hidden>
-                <div class="user-view-profile">
-                    <img id="view-user-image" class="user-avatar" alt="">
-                    <span id="view-user-initials" class="user-avatar initials" hidden></span>
-                    <div>
-                        <h4 id="view-user-name"></h4>
-                        <span id="view-user-code" class="code-pill"></span>
-                    </div>
-                </div>
-                <dl class="user-view-list">
-                    <div><dt>Email</dt><dd id="view-user-email"></dd></div>
-                    <div><dt>Phone</dt><dd id="view-user-phone"></dd></div>
-                    <div><dt>Address</dt><dd id="view-user-address"></dd></div>
-                    <div><dt>Status</dt><dd id="view-user-status"></dd></div>
-                    <div><dt>Last login</dt><dd id="view-user-last-login"></dd></div>
-                </dl>
-                <div class="modal-actions user-view-actions">
-                    <button type="button" class="secondary-button" data-close-user-modal>Close</button>
-                    <button type="button" class="primary-button" id="view-edit-user">Edit {{ $recordLabel }}</button>
-                </div>
-            </div>
         </div>
     </div>
 

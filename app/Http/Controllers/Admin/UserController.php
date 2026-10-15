@@ -15,6 +15,13 @@ class UserController extends Controller
         return $this->renderIndex($request);
     }
 
+    public function show(User $user)
+    {
+        $user->load('devices');
+
+        return view('admin.user-management.show', compact('user'));
+    }
+
     public function devices(Request $request)
     {
         return $this->renderIndex($request, true);

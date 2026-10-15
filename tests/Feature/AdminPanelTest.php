@@ -136,7 +136,7 @@ class AdminPanelTest extends TestCase
         $this->assertSame('active', $user->status);
     }
 
-    public function test_admin_user_page_renders_add_edit_and_view_popup_controls(): void
+    public function test_admin_user_page_routes_view_action_to_full_details_page(): void
     {
         $admin = Admin::factory()->create();
         $user = User::factory()->create([
@@ -152,15 +152,14 @@ class AdminPanelTest extends TestCase
             ->assertOk()
             ->assertSee('data-open-user-modal', false)
             ->assertSee('class="action-button edit-button"', false)
-            ->assertSee('class="action-button view-button"', false)
+            ->assertSee('class="action-button view-button" href="'.route('admin.user-management.users.show', $user).'"', false)
             ->assertSee('id="user-modal-backdrop"', false)
-            ->assertSee('id="user-view-details"', false)
-            ->assertSee('id="view-edit-user"', false)
+            ->assertDontSee('id="user-view-details"', false)
+            ->assertDontSee('id="view-edit-user"', false)
             ->assertSee('id="user-image-preview"', false)
             ->assertSee('id="user-modal-subtitle"', false)
             ->assertSee('name="status"', false)
             ->assertSee('Inactive</span>', false)
-            ->assertSee('data-user-code="'.$user->user_code.'"', false)
             ->assertSee('data-user-status="inactive"', false)
             ->assertSee(asset('assets/app.js').'?v='.hash_file('sha256', public_path('assets/app.js')), false)
             ->assertDontSee('const openUserModal', false);
@@ -170,10 +169,64 @@ class AdminPanelTest extends TestCase
             file_get_contents(public_path('assets/app.js'))
         );
         $this->assertStringContainsString("document.querySelectorAll('.edit-button')", file_get_contents(public_path('assets/app.js')));
-        $this->assertStringContainsString("document.querySelectorAll('.view-button')", file_get_contents(public_path('assets/app.js')));
+        $this->assertStringNotContainsString("document.querySelectorAll('.view-button')", file_get_contents(public_path('assets/app.js')));
         $this->assertStringContainsString("fields.image.addEventListener('change'", file_get_contents(public_path('assets/app.js')));
-        $this->assertStringContainsString("viewEditButton?.addEventListener('click'", file_get_contents(public_path('assets/app.js')));
         $this->assertStringContainsString("fields.status.value = isCreate ? 'active' : (user.status || 'active')", file_get_contents(public_path('assets/app.js')));
+    }
+
+    public function test_user_details_page_shows_full_account_and_linked_device_preview(): void
+    {
+        $admin = Admin::factory()->create();
+        $user = User::factory()->create([
+            'name' => 'Details User',
+            'email' => 'details.user@example.com',
+            'phone' => '9876543210',
+            'address' => 'Delhi, India',
+            'status' => 'active',
+            'last_login_at' => now()->subDay(),
+        ]);
+        Device::factory()->for($user)->create([
+            'manufacturer' => 'Eemo',
+            'device_model' => 'GT06',
+            'device_uuid' => 'details-device-uuid-001',
+            'firmware_version' => '1.2.3',
+        ]);
+
+        $this->actingAs($admin, 'admin')
+            ->get(route('admin.user-management.users.show', $user))
+            ->assertOk()
+            ->assertSee('Details User')
+            ->assertSee($user->user_code)
+            ->assertSee('details.user@example.com')
+            ->assertSee('9876543210')
+            ->assertSee('Delhi, India')
+            ->assertSee($user->user_code)
+            ->assertSee('Device details')
+            ->assertSee('Device name')
+            ->assertSee('Manufacturer / Brand')
+            ->assertSee('Device ID / UUID')
+            ->assertSee('Network')
+            ->assertSee('GPS status')
+            ->assertSee('Battery')
+            ->assertSee('Last update')
+            ->assertSee('CONNECTED DEVICE')
+            ->assertSee('class="user-detail-phone"', false)
+            ->assertSee('Eemo')
+            ->assertSee('GT06')
+            ->assertSee('details-device-uuid-001')
+            ->assertSee('Firmware version')
+            ->assertSee('1.2.3')
+            ->assertDontSee('Personal details')
+            ->assertDontSee('Email address')
+            ->assertDontSee('user-detail-device-meta', false)
+            ->assertDontSee('user-view-details', false);
+
+        $responseContent = $this->get(route('admin.user-management.users.show', $user))->getContent();
+        $deviceDetailsPosition = strpos($responseContent, 'Device details');
+        $devicePreviewPosition = strpos($responseContent, 'user-detail-device-panel');
+        $this->assertNotFalse($deviceDetailsPosition);
+        $this->assertNotFalse($devicePreviewPosition);
+        $this->assertLessThan($devicePreviewPosition, $deviceDetailsPosition);
     }
 
     public function test_admin_user_page_counts_active_and_inactive_users_from_database(): void
@@ -368,7 +421,7 @@ class AdminPanelTest extends TestCase
         $response->assertOk()->assertSee('class="auth-tech-bg"', false)->assertSee('class="auth-circuit-flow"', false)->assertSee('aria-label="GPS tracking map of India"', false)->assertSee('id="admin-traffic-map"', false)->assertDontSee('SAMPLE DATA')->assertSee('Total devices')->assertSee('1,284')->assertSee('1,126 active')->assertSee('158 inactive')->assertSee('User licenses')->assertSee('620')->assertSee('572 active')->assertSee('48 expired')->assertSee('Users online')->assertSee('184')->assertSee('Users offline')->assertSee('936')->assertDontSee('Ferry arrival')->assertDontSee('Train speed')->assertDontSee('Recent activity')->assertDontSee('Your account')->assertSee($admin->name)->assertSee('127.0.0.1')->assertSee('sidebar-admin-ip')->assertSee('brand-live-clock')->assertDontSee('sidebar-admin-clock')->assertSee('data-clock', false)->assertSee('data-timezone', false)->assertSee('Live Now')->assertDontSee('Realtime')->assertDontSee('Admin access');
         $this->assertStringContainsString('https://*.googleapis.com', $response->headers->get('Content-Security-Policy'));
         foreach (['profile', 'security/activity-logs', 'security/active-sessions', 'security/error-log', 'notifications', 'user-management/users', 'user-management/devices', 'user-management/reports', 'tracking/live-location', 'tracking/geo-fence', 'tracking/task', 'tracking/sos', 'groups', 'licence', 'licence/subscription', 'licence/payments', 'support'] as $path) {
-            $this->get('/admin/'.$path)->assertOk()->assertSee('Eemo')->assertSee('Notification')->assertSee('User & Account')->assertSee('User')->assertSee('Device')->assertSee('Reports')->assertSee('Tracking')->assertSee('Live &amp; History', false)->assertSee('Geofence &amp; SOS', false)->assertDontSee('<span>SOS</span>', false)->assertSee('Task')->assertSee('Group')->assertSee('Licence')->assertSee('Subscription')->assertSee('Payments')->assertSee('Support')->assertSee('Admin Profile')->assertDontSee('<span>My Profile</span>', false)->assertSee('Activity Log')->assertSee('Active Sessions')->assertSee('Error Log');
+            $this->get('/admin/'.$path)->assertOk()->assertSee('Eemo')->assertSee('Notification')->assertSee('User & Account')->assertSee('User')->assertSee('Device')->assertDontSee('<span>Reports</span>', false)->assertSee('Tracking')->assertSee('Live &amp; History', false)->assertSee('Geofence &amp; SOS', false)->assertDontSee('<span>SOS</span>', false)->assertSee('Task')->assertSee('Group')->assertSee('Licence')->assertSee('Subscription')->assertSee('Payments')->assertSee('Support')->assertSee('Admin Profile')->assertDontSee('<span>My Profile</span>', false)->assertSee('Activity Log')->assertSee('Active Sessions')->assertSee('Error Log');
         }
         $this->get('/admin/notifications')->assertSee('Notification</span>', false)->assertDontSee('<h1', false);
         $this->get('/admin/user-management/users')->assertSee('User</span>', false)->assertDontSee('<h1', false);

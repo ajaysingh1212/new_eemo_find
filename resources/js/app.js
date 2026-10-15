@@ -120,9 +120,8 @@ if (trafficMap) {
 (() => {
     const backdrop = document.getElementById('user-modal-backdrop');
     const form = document.getElementById('user-form');
-    const details = document.getElementById('user-view-details');
 
-    if (!backdrop || !form || !details) return;
+    if (!backdrop || !form) return;
 
     const entity = backdrop.dataset.entity || 'user';
     const entityTitle = entity.charAt(0).toUpperCase() + entity.slice(1);
@@ -131,9 +130,7 @@ if (trafficMap) {
         tag: document.getElementById('user-modal-tag'),
         title: document.getElementById('user-modal-title'),
         subtitle: document.getElementById('user-modal-subtitle'),
-        submit: document.getElementById('user-submit-button'),
         submitLabel: document.getElementById('user-submit-label'),
-        cancel: document.getElementById('user-cancel-button'),
         name: document.getElementById('user-name'),
         email: document.getElementById('user-email'),
         phone: document.getElementById('user-phone'),
@@ -145,42 +142,23 @@ if (trafficMap) {
         image: document.getElementById('user-image'),
         imagePreview: document.getElementById('user-image-preview'),
         imageName: document.getElementById('user-image-name'),
-        viewImage: document.getElementById('view-user-image'),
-        viewInitials: document.getElementById('view-user-initials'),
     };
-    const viewFields = {
-        name: document.getElementById('view-user-name'),
-        code: document.getElementById('view-user-code'),
-        email: document.getElementById('view-user-email'),
-        phone: document.getElementById('view-user-phone'),
-        address: document.getElementById('view-user-address'),
-        status: document.getElementById('view-user-status'),
-        lastLogin: document.getElementById('view-user-last-login'),
-    };
-    const viewEditButton = document.getElementById('view-edit-user');
     let selectedUser = null;
     let previewUrl = null;
 
     const openModal = (mode, user = null) => {
         const isCreate = mode === 'create';
-        const isView = mode === 'view';
         if (!isCreate && !user) return;
 
         const reopeningAfterValidation = isCreate && backdrop.hasAttribute('data-reopen-create');
         selectedUser = user;
-        fields.tag.textContent = `${isCreate ? 'CREATE' : isView ? 'VIEW' : 'UPDATE'} ${entityTitle.toUpperCase()}`;
-        fields.title.textContent = isCreate ? `Register a new ${entity}` : isView ? `${entityTitle} details` : `Edit ${entity}`;
+        fields.tag.textContent = isCreate ? `CREATE ${entityTitle.toUpperCase()}` : `UPDATE ${entityTitle.toUpperCase()}`;
+        fields.title.textContent = isCreate ? `Register a new ${entity}` : `Edit ${entity}`;
         fields.subtitle.textContent = isCreate
             ? `Add a ${entity} record to your registry.`
-            : isView
-                ? `Review the registered ${entity} information.`
-                : `Update this ${entity}’s registry information.`;
-        form.hidden = isView;
-        details.hidden = !isView;
+            : `Update this ${entity}’s registry information.`;
         fields.method.value = isCreate ? 'POST' : 'PUT';
-        fields.submit.hidden = isView;
         fields.submitLabel.textContent = isCreate ? `Create ${entity}` : 'Save changes';
-        fields.cancel.textContent = isView ? 'Close' : 'Cancel';
         form.action = isCreate
             ? form.dataset.createAction
             : form.dataset.updateActionTemplate.replace('__USER__', user.id);
@@ -195,17 +173,17 @@ if (trafficMap) {
         fields.password.required = isCreate;
         fields.passwordRequiredMark.hidden = !isCreate;
         fields.password.placeholder = isCreate ? 'Enter password' : 'Leave empty to keep current password';
-        fields.statusField.hidden = isCreate || isView;
-        fields.status.disabled = isCreate || isView;
-        fields.status.required = !isCreate && !isView;
+        fields.statusField.hidden = isCreate;
+        fields.status.disabled = isCreate;
+        fields.status.required = !isCreate;
         fields.status.value = isCreate ? 'active' : (user.status || 'active');
         fields.image.value = '';
-        fields.name.readOnly = isView;
-        fields.email.readOnly = isView;
-        fields.phone.readOnly = isView;
-        fields.address.readOnly = isView;
-        fields.password.readOnly = isView;
-        fields.image.disabled = isView;
+        fields.name.readOnly = false;
+        fields.email.readOnly = false;
+        fields.phone.readOnly = false;
+        fields.address.readOnly = false;
+        fields.password.readOnly = false;
+        fields.image.disabled = false;
         if (previewUrl) {
             URL.revokeObjectURL(previewUrl);
             previewUrl = null;
@@ -215,30 +193,9 @@ if (trafficMap) {
         fields.imagePreview.hidden = !initialImage;
         fields.imageName.textContent = initialImage ? 'Current profile photo' : 'Choose a profile photo';
 
-        if (isView) {
-            viewFields.name.textContent = user.name || '';
-            viewFields.code.textContent = user.code || '';
-            viewFields.email.textContent = user.email || '—';
-            viewFields.phone.textContent = user.phone || '—';
-            viewFields.address.textContent = user.address || '—';
-            viewFields.status.textContent = (user.status || 'inactive').charAt(0).toUpperCase() + (user.status || 'inactive').slice(1);
-            viewFields.lastLogin.textContent = user.lastLogin || 'Never';
-            fields.viewImage.alt = user.name ? `${user.name} profile` : `${entityTitle} profile`;
-            if (user.image) {
-                fields.viewImage.src = user.image;
-                fields.viewImage.hidden = false;
-                fields.viewInitials.hidden = true;
-            } else {
-                fields.viewImage.removeAttribute('src');
-                fields.viewImage.hidden = true;
-                fields.viewInitials.textContent = (user.name || entityTitle.charAt(0)).trim().split(/\s+/).slice(0, 2).map(part => part.charAt(0).toUpperCase()).join('');
-                fields.viewInitials.hidden = false;
-            }
-        }
-
         backdrop.hidden = false;
         document.body.style.overflow = 'hidden';
-        (isView ? fields.cancel : fields.name).focus();
+        fields.name.focus();
     };
 
     if (form.dataset.demoOnly === 'true') {
@@ -256,19 +213,6 @@ if (trafficMap) {
     document.querySelectorAll('[data-close-user-modal]').forEach(button => {
         button.addEventListener('click', closeModal);
     });
-    document.querySelectorAll('.view-button').forEach(button => {
-        button.addEventListener('click', () => openModal('view', {
-            id: button.dataset.userId,
-            name: button.dataset.userName,
-            email: button.dataset.userEmail,
-            phone: button.dataset.userPhone,
-            address: button.dataset.userAddress,
-            status: button.dataset.userStatus,
-            code: button.dataset.userCode,
-            lastLogin: button.dataset.userLastLogin,
-            image: button.dataset.userImage,
-        }));
-    });
     document.querySelectorAll('.edit-button').forEach(button => {
         button.addEventListener('click', () => openModal('edit', {
             id: button.dataset.userId,
@@ -279,9 +223,6 @@ if (trafficMap) {
             image: button.dataset.userImage,
             status: button.dataset.userStatus,
         }));
-    });
-    viewEditButton?.addEventListener('click', () => {
-        if (selectedUser) openModal('edit', selectedUser);
     });
     fields.image.addEventListener('change', () => {
         const [file] = fields.image.files;
