@@ -12,6 +12,16 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
+        return $this->renderIndex($request);
+    }
+
+    public function devices(Request $request)
+    {
+        return $this->renderIndex($request, true);
+    }
+
+    private function renderIndex(Request $request, bool $isDevicePage = false)
+    {
         $search = trim((string) $request->query('q', ''));
 
         $users = User::query()
@@ -32,7 +42,7 @@ class UserController extends Controller
         $activeUsers = User::where('status', 'active')->count();
         $inactiveUsers = User::where('status', 'inactive')->count();
 
-        return view('admin.user-management.users', compact('users', 'totalUsers', 'activeUsers', 'inactiveUsers', 'search'));
+        return view('admin.user-management.users', compact('users', 'totalUsers', 'activeUsers', 'inactiveUsers', 'search', 'isDevicePage'));
     }
 
     public function store(Request $request)

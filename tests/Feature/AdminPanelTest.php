@@ -162,6 +162,71 @@ class AdminPanelTest extends TestCase
         $this->assertSame('1', $inactiveCount[1] ?? null);
     }
 
+    public function test_admin_device_page_uses_user_data_with_device_labels_and_demo_only_actions(): void
+    {
+        $admin = Admin::factory()->create();
+        $user = User::factory()->create([
+            'name' => 'Demo Device Owner',
+            'email' => 'device.owner@example.com',
+            'phone' => '9876543210',
+            'address' => '123 Demo Device Street',
+            'status' => 'active',
+        ]);
+
+        $response = $this->actingAs($admin, 'admin')
+            ->get(route('admin.user-management.devices'))
+            ->assertOk()
+            ->assertSee('Device Management')
+            ->assertSee('Total devices')
+            ->assertSee('Active devices')
+            ->assertDontSee('Add device')
+            ->assertDontSee('data-open-user-modal', false)
+            ->assertSee('Search devices...')
+            ->assertSee('Demo Device Owner')
+            ->assertSee('class="registered-user-card device-card"', false)
+            ->assertSee('class="registered-user-top device-owner-header"', false)
+            ->assertSee('class="device-phone"', false)
+            ->assertSee('class="device-card-content"', false)
+            ->assertSee('class="registered-user-status is-active"', false)
+            ->assertSee('Connected')
+            ->assertSee('class="device-specs"', false)
+            ->assertSee('Eemo Tracker')
+            ->assertSee('GT06')
+            ->assertSee('Airtel 4G')
+            ->assertSee('GPS Status')
+            ->assertSee('78%')
+            ->assertSee('Last Update')
+            ->assertDontSee('device.owner@example.com</span>', false)
+            ->assertDontSee('9876543210</span>', false)
+            ->assertDontSee('123 Demo Device Street</span>', false)
+            ->assertSee('data-entity="device"', false)
+            ->assertSee('>Track</a>', false)
+            ->assertSee('>Report</a>', false)
+            ->assertSee(route('admin.tracking.live-location'), false)
+            ->assertSee(route('admin.user-management.reports'), false)
+            ->assertDontSee('edit-button', false)
+            ->assertDontSee('view-button', false)
+            ->assertSee('data-demo-only="true"', false)
+            ->assertSee('Demo only — device changes are not saved.')
+            ->assertSee(route('admin.user-management.devices'), false);
+
+        $response->assertDontSee('Total users')->assertDontSee('Add user');
+        $response->assertSee('action="#"', false);
+
+        $this->post(route('admin.user-management.devices'), [
+            'name' => 'Should Not Be Saved',
+            'email' => 'not.saved@example.com',
+            'phone' => '9876543211',
+            'password' => 'StrongPassword!123',
+        ])->assertMethodNotAllowed();
+        $this->assertDatabaseCount('users', 1);
+
+        $this->get(route('admin.user-management.users'))
+            ->assertOk()
+            ->assertSee('class="registered-user-card"', false)
+            ->assertDontSee('device-phone', false);
+    }
+
     public function test_admin_can_edit_a_registered_user_from_the_edit_popup(): void
     {
         $admin = Admin::factory()->create();

@@ -26,7 +26,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('user-management/users', [UserController::class, 'index'])->name('user-management.users');
         Route::post('user-management/users', [UserController::class, 'store'])->name('user-management.users.store');
         Route::put('user-management/users/{user}', [UserController::class, 'update'])->name('user-management.users.update');
-        Route::view('user-management/devices', 'admin.blank', ['title' => 'Device'])->name('user-management.devices');
+        Route::get('user-management/devices', [UserController::class, 'devices'])->name('user-management.devices');
         Route::view('user-management/reports', 'admin.blank', ['title' => 'Reports'])->name('user-management.reports');
         Route::view('tracking/live-location', 'admin.blank', ['title' => 'Live Location'])->name('tracking.live-location');
         Route::view('tracking/history', 'admin.blank', ['title' => 'History'])->name('tracking.history');

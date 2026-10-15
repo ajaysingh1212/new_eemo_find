@@ -124,6 +124,8 @@ if (trafficMap) {
 
     if (!backdrop || !form || !details) return;
 
+    const entity = backdrop.dataset.entity || 'user';
+    const entityTitle = entity.charAt(0).toUpperCase() + entity.slice(1);
     const fields = {
         method: document.getElementById('user-form-method'),
         tag: document.getElementById('user-modal-tag'),
@@ -166,18 +168,18 @@ if (trafficMap) {
 
         const reopeningAfterValidation = isCreate && backdrop.hasAttribute('data-reopen-create');
         selectedUser = user;
-        fields.tag.textContent = isCreate ? 'CREATE USER' : isView ? 'VIEW USER' : 'UPDATE USER';
-        fields.title.textContent = isCreate ? 'Register a new user' : isView ? 'User details' : 'Edit user';
+        fields.tag.textContent = `${isCreate ? 'CREATE' : isView ? 'VIEW' : 'UPDATE'} ${entityTitle.toUpperCase()}`;
+        fields.title.textContent = isCreate ? `Register a new ${entity}` : isView ? `${entityTitle} details` : `Edit ${entity}`;
         fields.subtitle.textContent = isCreate
-            ? 'Add a user record to your registry.'
+            ? `Add a ${entity} record to your registry.`
             : isView
-                ? 'Review the registered user information.'
-                : 'Update this user’s registry information.';
+                ? `Review the registered ${entity} information.`
+                : `Update this ${entity}’s registry information.`;
         form.hidden = isView;
         details.hidden = !isView;
         fields.method.value = isCreate ? 'POST' : 'PUT';
         fields.submit.hidden = isView;
-        fields.submitLabel.textContent = isCreate ? 'Create user' : 'Save changes';
+        fields.submitLabel.textContent = isCreate ? `Create ${entity}` : 'Save changes';
         fields.cancel.textContent = isView ? 'Close' : 'Cancel';
         form.action = isCreate
             ? form.dataset.createAction
@@ -221,7 +223,7 @@ if (trafficMap) {
             viewFields.address.textContent = user.address || '—';
             viewFields.status.textContent = (user.status || 'inactive').charAt(0).toUpperCase() + (user.status || 'inactive').slice(1);
             viewFields.lastLogin.textContent = user.lastLogin || 'Never';
-            fields.viewImage.alt = user.name ? `${user.name} profile` : 'User profile';
+            fields.viewImage.alt = user.name ? `${user.name} profile` : `${entityTitle} profile`;
             if (user.image) {
                 fields.viewImage.src = user.image;
                 fields.viewImage.hidden = false;
@@ -229,7 +231,7 @@ if (trafficMap) {
             } else {
                 fields.viewImage.removeAttribute('src');
                 fields.viewImage.hidden = true;
-                fields.viewInitials.textContent = (user.name || 'U').trim().split(/\s+/).slice(0, 2).map(part => part.charAt(0).toUpperCase()).join('');
+                fields.viewInitials.textContent = (user.name || entityTitle.charAt(0)).trim().split(/\s+/).slice(0, 2).map(part => part.charAt(0).toUpperCase()).join('');
                 fields.viewInitials.hidden = false;
             }
         }
@@ -238,6 +240,10 @@ if (trafficMap) {
         document.body.style.overflow = 'hidden';
         (isView ? fields.cancel : fields.name).focus();
     };
+
+    if (form.dataset.demoOnly === 'true') {
+        form.addEventListener('submit', event => event.preventDefault());
+    }
 
     const closeModal = () => {
         backdrop.hidden = true;

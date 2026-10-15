@@ -1119,6 +1119,12 @@ body.admin-shell {
     transition: filter .18s ease, transform .18s ease;
 }
 
+.admin-shell a.action-button {
+    display: grid;
+    place-items: center;
+    text-decoration: none;
+}
+
 .admin-shell .action-button:hover {
     filter: brightness(.97);
     transform: translateY(-1px);
@@ -1132,6 +1138,16 @@ body.admin-shell {
 .admin-shell .action-button.view-button {
     color: #ffffff;
     background: linear-gradient(135deg, #2d8be9, #2467df);
+}
+
+.admin-shell .action-button.track-button {
+    color: #ffffff;
+    background: linear-gradient(135deg, #2d8be9, #2467df);
+}
+
+.admin-shell .action-button.report-button {
+    color: #315782;
+    background: #c9e0ff;
 }
 
 .admin-shell .user-grid-empty {
@@ -1679,6 +1695,390 @@ body.admin-shell {
 
     .admin-shell .registered-user-card {
         padding: 16px;
+    }
+}
+
+.admin-shell .user-management.device-management .user-card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.admin-shell .device-card {
+    display: grid;
+    grid-template-columns: 92px minmax(0, 1fr);
+    align-items: center;
+    gap: 18px;
+    min-height: 258px;
+    padding: 18px;
+}
+
+.admin-shell .device-owner-header {
+    grid-column: 1 / -1;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.admin-shell .device-phone {
+    width: 84px;
+    height: 164px;
+    flex: none;
+    padding: 5px;
+    border: 1px solid #40516b;
+    border-radius: 20px;
+    background: linear-gradient(145deg, #344663, #101a2c 72%);
+    box-shadow: 0 9px 18px rgba(27, 48, 83, .2), inset 0 1px 1px rgba(255, 255, 255, .35);
+}
+
+.admin-shell .device-phone-screen {
+    position: relative;
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+    padding: 15px 7px 11px;
+    border-radius: 15px;
+    background: radial-gradient(circle at 50% 44%, #ffffff 0, #f5f9ff 58%, #e4efff 100%);
+}
+
+.admin-shell .device-phone-notch {
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    width: 26px;
+    height: 5px;
+    transform: translateX(-50%);
+    border-radius: 999px;
+    background: #18263a;
+}
+
+.admin-shell .device-phone-statusbar {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.admin-shell .device-phone-statusbar i {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: #7d8ca3;
+}
+
+.admin-shell .device-phone-appmark {
+    display: grid;
+    width: 26px;
+    height: 26px;
+    flex: none;
+    place-items: center;
+    border-radius: 8px;
+    background: linear-gradient(145deg, #5597f4, #575de0);
+    color: #fff;
+    box-shadow: 0 3px 8px rgba(75, 112, 211, .24);
+}
+
+.admin-shell .device-phone-appmark .icon {
+    width: 15px;
+    height: 15px;
+}
+
+.admin-shell .device-phone-appname {
+    margin-top: 4px;
+    color: #1e355a;
+    font-size: .54rem;
+    line-height: 1.2;
+}
+
+.admin-shell .device-phone-caption {
+    margin: 3px 0 5px;
+    color: #8391a7;
+    font-size: .36rem;
+    font-weight: 750;
+    letter-spacing: .08em;
+}
+
+.admin-shell .device-phone-map {
+    position: relative;
+    width: 100%;
+    height: 43px;
+    flex: none;
+    overflow: hidden;
+    border: 1px solid #d9e7f7;
+    border-radius: 7px;
+    background:
+        linear-gradient(32deg, transparent 45%, rgba(112, 166, 222, .42) 46%, rgba(112, 166, 222, .42) 49%, transparent 50%),
+        linear-gradient(140deg, transparent 42%, rgba(130, 187, 157, .32) 43%, rgba(130, 187, 157, .32) 61%, transparent 62%),
+        repeating-linear-gradient(0deg, transparent 0 9px, rgba(135, 164, 197, .16) 10px 11px),
+        repeating-linear-gradient(90deg, transparent 0 11px, rgba(135, 164, 197, .16) 12px 13px),
+        #edf5fc;
+}
+
+.admin-shell .device-phone-map i {
+    position: absolute;
+    top: 10px;
+    left: 18px;
+    width: 27px;
+    height: 21px;
+    transform: rotate(-30deg);
+    border: 1.5px solid transparent;
+    border-top-color: #397be2;
+    border-right-color: #397be2;
+    border-radius: 50%;
+}
+
+.admin-shell .device-phone-map b {
+    position: absolute;
+    top: 20px;
+    left: 38px;
+    width: 7px;
+    height: 7px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    background: #3e7ce4;
+    box-shadow: 0 0 0 2px rgba(62, 124, 228, .2);
+}
+
+.admin-shell .device-phone-connection {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 6px;
+    color: #63758d;
+    font-size: .42rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.admin-shell .device-phone-connection i {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #9aa8ba;
+}
+
+.admin-shell .device-phone-connection.is-connected i {
+    background: #28a568;
+    box-shadow: 0 0 0 2px rgba(40, 165, 104, .13);
+}
+
+.admin-shell .device-phone-home {
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    width: 24px;
+    height: 2px;
+    transform: translateX(-50%);
+    border-radius: 999px;
+    background: #aab7c9;
+}
+
+.admin-shell .device-card-content {
+    display: flex;
+    min-width: 0;
+    height: 100%;
+    flex-direction: column;
+    justify-content: center;
+    gap: 14px;
+}
+
+.admin-shell .device-specs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    min-width: 0;
+    padding: 3px 0;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(245, 248, 255, .95), rgba(235, 240, 252, .95));
+}
+
+.admin-shell .device-spec {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 9px;
+    padding: 8px;
+}
+
+.admin-shell .device-spec:nth-child(odd) {
+    padding-left: 4px;
+    border-right: 1px solid rgba(130, 151, 192, .2);
+}
+
+.admin-shell .device-spec:nth-child(-n+4) {
+    border-bottom: 1px solid rgba(130, 151, 192, .2);
+}
+
+.admin-shell .device-spec-icon {
+    display: grid;
+    width: 34px;
+    height: 34px;
+    flex: none;
+    place-items: center;
+    border-radius: 50%;
+}
+
+.admin-shell .device-spec-icon .icon {
+    width: 17px;
+    height: 17px;
+}
+
+.admin-shell .device-tone-green { color: #0cad69; background: #ddf8eb; }
+.admin-shell .device-tone-red { color: #f04758; background: #ffe4e8; }
+.admin-shell .device-tone-orange { color: #ed9415; background: #fff0d9; }
+.admin-shell .device-tone-blue { color: #2478ed; background: #deebff; }
+.admin-shell .device-tone-teal { color: #08a886; background: #d9f8f0; }
+.admin-shell .device-tone-purple { color: #8a47e8; background: #f0e2ff; }
+
+.admin-shell .device-spec-copy {
+    display: block;
+    min-width: 0;
+}
+
+.admin-shell .device-spec-copy small {
+    display: block;
+    overflow: hidden;
+    color: #637795;
+    font-size: .64rem;
+    line-height: 1.35;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admin-shell .device-spec-copy strong {
+    display: block;
+    overflow: hidden;
+    color: #1b2d4b;
+    font-size: .79rem;
+    font-weight: 750;
+    line-height: 1.45;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admin-shell .device-spec-copy strong .device-signal-bars {
+    display: inline-flex;
+    height: 13px;
+    align-items: end;
+    gap: 2px;
+    margin-left: 4px;
+    vertical-align: -1px;
+}
+
+.admin-shell .device-signal-bars i {
+    width: 4px;
+    border-radius: 2px 2px 0 0;
+    background: #10c87b;
+}
+
+.admin-shell .device-signal-bars i:nth-child(1) { height: 5px; }
+.admin-shell .device-signal-bars i:nth-child(2) { height: 9px; }
+.admin-shell .device-signal-bars i:nth-child(3) { height: 13px; }
+
+.admin-shell .device-gps-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 9px;
+    border-radius: 999px;
+    background: #d8f6e9;
+    color: #168851;
+    font-size: .72rem;
+}
+
+.admin-shell .device-gps-status i {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #15ae68;
+}
+
+.admin-shell .device-gps-status.is-off {
+    background: #fff0df;
+    color: #a56417;
+}
+
+.admin-shell .device-gps-status.is-off i {
+    background: #d58b29;
+}
+
+.admin-shell .device-battery-copy {
+    display: grid;
+    grid-template-columns: auto minmax(30px, 1fr);
+    align-items: center;
+    column-gap: 8px;
+}
+
+.admin-shell .device-battery-copy small {
+    grid-column: 1 / -1;
+}
+
+.admin-shell .device-battery-meter {
+    display: block;
+    height: 8px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #d4deef;
+}
+
+.admin-shell .device-battery-meter i {
+    display: block;
+    width: 78%;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #13d390, #0dbb78);
+}
+
+@media (max-width: 840px) {
+    .admin-shell .user-management.device-management .user-card-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 560px) {
+    .admin-shell .device-card {
+        grid-template-columns: 72px minmax(0, 1fr);
+        gap: 12px;
+        min-height: 234px;
+        padding: 14px;
+    }
+
+    .admin-shell .device-phone {
+        width: 68px;
+        height: 142px;
+        padding: 4px;
+        border-radius: 17px;
+    }
+
+    .admin-shell .device-phone-screen {
+        border-radius: 13px;
+    }
+
+    .admin-shell .device-card-content {
+        gap: 10px;
+    }
+
+    .admin-shell .device-spec {
+        gap: 6px;
+        padding: 7px 5px;
+    }
+
+    .admin-shell .device-spec-icon {
+        width: 28px;
+        height: 28px;
+    }
+
+    .admin-shell .device-spec-icon .icon {
+        width: 14px;
+        height: 14px;
+    }
+
+    .admin-shell .device-spec-copy small {
+        font-size: .58rem;
+    }
+
+    .admin-shell .device-spec-copy strong {
+        font-size: .68rem;
     }
 }
 
