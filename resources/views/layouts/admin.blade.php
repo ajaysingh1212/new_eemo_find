@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><title>@yield('title', 'Dashboard') · Eemo-Find</title>@include('layouts.assets', ['adminTheme' => true])</head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><meta name="csrf-token" content="{{ csrf_token() }}"><title>@yield('title', 'Dashboard') · Eemo-Find</title>@include('layouts.assets', ['adminTheme' => true])</head>
 <body class="admin-shell">
 <svg class="auth-tech-bg" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
     <defs>
@@ -67,13 +67,25 @@
 </div></aside>
 <div class="main-shell">
 <header class="topbar">
-<div class="topbar-start"><button class="icon-button" id="sidebar-toggle" aria-label="Toggle sidebar" aria-controls="sidebar" aria-expanded="true"><x-icon name="menu" /></button>
-<form class="topbar-search" method="GET" action="{{ route('admin.security.activity-logs.index') }}" role="search">
-    <x-icon name="search" /><label class="sr-only" for="workspace-search">Search activity logs</label>
-    <input id="workspace-search" name="search" type="search" placeholder="Search your activity…" maxlength="120" value="{{ request()->routeIs('admin.security.activity-logs.index') ? request('search') : '' }}">
-    <button type="submit" aria-label="Search activity logs"><x-icon name="arrow" /></button>
-</form></div>
-<div class="topbar-end"><span class="admin-only"><span class="status-dot"></span> Live Now</span><span class="topbar-divider"></span><x-avatar :admin="auth('admin')->user()" /><span class="topbar-name">{{ auth('admin')->user()->name }}</span><form method="POST" action="{{ route('admin.logout') }}">@csrf<button class="icon-button" aria-label="Sign out"><x-icon name="logout" /></button></form></div>
+<div class="topbar-start"><button class="icon-button" id="sidebar-toggle" aria-label="Toggle sidebar" aria-controls="sidebar" aria-expanded="true"><x-icon name="menu" /></button></div>
+<div class="topbar-end">
+<div class="admin-weather" id="admin-weather" data-location-url="{{ route('admin.session.location') }}" data-latitude="{{ session('admin_location.latitude', '') }}" data-longitude="{{ session('admin_location.longitude', '') }}" data-permission-status="{{ session('admin_location.permission_status', '') }}">
+    <span class="admin-weather-icon" id="admin-weather-icon" aria-hidden="true"><x-icon name="sun" /><x-icon name="cloud" hidden /><x-icon name="cloud-rain" hidden /></span>
+    <span class="admin-weather-copy"><strong id="admin-weather-temperature">--°</strong><small id="admin-weather-condition">Location not set</small></span>
+    <span class="admin-weather-metrics" aria-label="Current weather details">
+        <span><strong id="admin-weather-feels-like">--°</strong><small>Feels</small></span>
+        <span><strong id="admin-weather-humidity">--%</strong><small>Humidity</small></span>
+        <span><strong id="admin-weather-wind">-- km/h</strong><small>Wind</small></span>
+    </span>
+    <span class="admin-weather-location-divider" aria-hidden="true"></span>
+    <button type="button" class="icon-button admin-location-button" id="admin-location-button" aria-label="Refresh location and weather" title="Refresh location and weather"><x-icon name="refresh" /></button>
+    <span class="admin-weather-location">
+        <strong id="admin-weather-coordinates">{{ session()->has('admin_location.latitude') && session()->has('admin_location.longitude') ? number_format((float) session('admin_location.latitude'), 4).'°, '.number_format((float) session('admin_location.longitude'), 4).'°' : 'Location not set' }}</strong>
+        <small>IP {{ request()->ip() ?? 'Unavailable' }}</small>
+    </span>
+    <span class="sr-only" id="admin-weather-status" aria-live="polite"></span>
+</div>
+<span class="topbar-divider"></span><x-avatar :admin="auth('admin')->user()" /><span class="topbar-name">{{ auth('admin')->user()->name }}</span><form method="POST" action="{{ route('admin.logout') }}">@csrf<button class="icon-button" aria-label="Sign out"><x-icon name="logout" /></button></form></div>
 </header>
 <main id="main" class="main-content container-fluid" tabindex="-1"><nav class="breadcrumbs" aria-label="Breadcrumb"><span>Workspace</span><span class="separator">/</span>@if(request()->routeIs('admin.security.*'))<span>Security</span><span class="separator">/</span>@endif<span aria-current="page">@yield('title', 'Dashboard')</span></nav><x-alert />@yield('content')</main>
 <footer class="footer"><span>© {{ now()->year }} Eemo-Find</span><span>Administrator workspace <span class="footer-dot">·</span> Private &amp; secure</span><span>Developed by <strong><a href="https://www.sanketkumarofficial.in/" target="_blank" rel="noopener noreferrer">Sanket Kumar</a></strong></span></footer>

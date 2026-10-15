@@ -355,11 +355,60 @@ class AdminPanelTest extends TestCase
         $admin = Admin::factory()->create();
         $this->get('/admin/login');
         $before = session()->getId();
-        $this->post('/admin/login', ['email' => strtoupper($admin->email), 'password' => 'TestPassword!123'])->assertRedirect(route('admin.dashboard'));
+        $this->post('/admin/login', [
+            'email' => strtoupper($admin->email),
+            'password' => 'TestPassword!123',
+            'latitude' => '28.6139',
+            'longitude' => '77.2090',
+            'location_status' => 'granted',
+        ])->assertRedirect(route('admin.dashboard'))
+            ->assertSessionHas('admin_location.latitude', 28.6139)
+            ->assertSessionHas('admin_location.longitude', 77.209)
+            ->assertSessionHas('admin_location.permission_status', 'granted');
         $this->assertAuthenticatedAs($admin, 'admin');
         $this->assertNotSame($before, session()->getId());
         $this->assertDatabaseHas('admin_activity_logs', ['admin_id' => $admin->id, 'action' => 'login.success']);
         $this->get('/admin/login')->assertRedirect(route('admin.dashboard'));
+    }
+
+    public function test_admin_login_continues_when_location_permission_is_denied(): void
+    {
+        $admin = Admin::factory()->create();
+
+        $this->post('/admin/login', [
+            'email' => $admin->email,
+            'password' => 'TestPassword!123',
+            'location_status' => 'denied',
+        ])->assertRedirect(route('admin.dashboard'))
+            ->assertSessionHas('admin_location.permission_status', 'denied');
+
+        $this->assertAuthenticatedAs($admin, 'admin');
+        $this->assertNull(session('admin_location.latitude'));
+        $this->assertNull(session('admin_location.longitude'));
+    }
+
+    public function test_admin_weather_location_is_saved_to_its_own_session(): void
+    {
+        $admin = Admin::factory()->create();
+        $response = $this->actingAs($admin, 'admin')
+            ->postJson(route('admin.session.location'), [
+                'latitude' => 40.7128,
+                'longitude' => -74.0060,
+                'permission_status' => 'granted',
+            ]);
+
+        $response->assertOk()->assertExactJson(['saved' => true]);
+        $this->assertSame(40.7128, session('admin_location.latitude'));
+        $this->assertSame(-74.006, session('admin_location.longitude'));
+        $this->get('/admin/dashboard')
+            ->assertSee('data-latitude="40.7128"', false)
+            ->assertSee('data-longitude="-74.006"', false);
+
+        $this->postJson(route('admin.session.location'), ['permission_status' => 'denied'])
+            ->assertOk()
+            ->assertExactJson(['saved' => true]);
+        $this->assertSame(40.7128, session('admin_location.latitude'));
+        $this->assertSame('denied', session('admin_location.permission_status'));
     }
 
     public function test_standalone_asset_urls_are_fingerprinted_and_admin_theme_is_scoped(): void
@@ -370,6 +419,9 @@ class AdminPanelTest extends TestCase
 
         $this->get('/admin/login')
             ->assertOk()
+            ->assertSee('data-login-location', false)
+            ->assertSee('name="latitude"', false)
+            ->assertSee('name="longitude"', false)
             ->assertSee(asset('assets/app.css').'?v='.hash_file('sha256', public_path('assets/app.css')), false)
             ->assertSee(asset('assets/app.js').'?v='.hash_file('sha256', public_path('assets/app.js')), false)
             ->assertDontSee(asset('assets/admin-theme.css'), false);
@@ -418,8 +470,20 @@ class AdminPanelTest extends TestCase
         $this->actingAs($admin, 'admin');
         $this->assertNotEmpty(config('services.google_maps.api_key'));
         $response = $this->get('/admin/dashboard');
-        $response->assertOk()->assertSee('class="auth-tech-bg"', false)->assertSee('class="auth-circuit-flow"', false)->assertSee('aria-label="GPS tracking map of India"', false)->assertSee('id="admin-traffic-map"', false)->assertDontSee('SAMPLE DATA')->assertSee('Total devices')->assertSee('1,284')->assertSee('1,126 active')->assertSee('158 inactive')->assertSee('User licenses')->assertSee('620')->assertSee('572 active')->assertSee('48 expired')->assertSee('Users online')->assertSee('184')->assertSee('Users offline')->assertSee('936')->assertDontSee('Ferry arrival')->assertDontSee('Train speed')->assertDontSee('Recent activity')->assertDontSee('Your account')->assertSee($admin->name)->assertSee('127.0.0.1')->assertSee('sidebar-admin-ip')->assertSee('brand-live-clock')->assertDontSee('sidebar-admin-clock')->assertSee('data-clock', false)->assertSee('data-timezone', false)->assertSee('Live Now')->assertDontSee('Realtime')->assertDontSee('Admin access');
+        $response->assertSee('id="admin-weather"', false)
+            ->assertSee('id="admin-weather-feels-like"', false)
+            ->assertSee('id="admin-weather-humidity"', false)
+            ->assertSee('id="admin-weather-wind"', false)
+            ->assertSee('id="admin-weather-coordinates"', false)
+            ->assertSee('aria-label="Refresh location and weather"', false)
+            ->assertSee('<button type="button" class="icon-button admin-location-button" id="admin-location-button" aria-label="Refresh location and weather" title="Refresh location and weather"><svg class="icon" viewBox="0 0 24 24"', false)
+            ->assertSee('IP 127.0.0.1')
+            ->assertSee(route('admin.session.location'), false)
+            ->assertDontSee('workspace-search', false);
+        $response->assertOk()->assertSee('class="auth-tech-bg"', false)->assertSee('class="auth-circuit-flow"', false)->assertSee('aria-label="GPS tracking map of India"', false)->assertSee('id="admin-traffic-map"', false)->assertDontSee('Live Now')->assertDontSee('SAMPLE DATA')->assertSee('Total devices')->assertSee('1,284')->assertSee('1,126 active')->assertSee('158 inactive')->assertSee('User licenses')->assertSee('620')->assertSee('572 active')->assertSee('48 expired')->assertSee('Users online')->assertSee('184')->assertSee('Users offline')->assertSee('936')->assertDontSee('Ferry arrival')->assertDontSee('Train speed')->assertDontSee('Recent activity')->assertDontSee('Your account')->assertSee($admin->name)->assertSee('127.0.0.1')->assertSee('sidebar-admin-ip')->assertSee('brand-live-clock')->assertDontSee('sidebar-admin-clock')->assertSee('data-clock', false)->assertSee('data-timezone', false)->assertDontSee('Realtime')->assertDontSee('Admin access');
         $this->assertStringContainsString('https://*.googleapis.com', $response->headers->get('Content-Security-Policy'));
+        $this->assertStringContainsString('https://api.open-meteo.com', $response->headers->get('Content-Security-Policy'));
+        $this->assertSame('camera=(), microphone=(), geolocation=(self)', $response->headers->get('Permissions-Policy'));
         foreach (['profile', 'security/activity-logs', 'security/active-sessions', 'security/error-log', 'notifications', 'user-management/users', 'user-management/devices', 'user-management/reports', 'tracking/live-location', 'tracking/geo-fence', 'tracking/task', 'tracking/sos', 'groups', 'licence', 'licence/subscription', 'licence/payments', 'support'] as $path) {
             $this->get('/admin/'.$path)->assertOk()->assertSee('Eemo')->assertSee('Notification')->assertSee('User & Account')->assertSee('User')->assertSee('Device')->assertDontSee('<span>Reports</span>', false)->assertSee('Tracking')->assertSee('Live &amp; History', false)->assertSee('Geofence &amp; SOS', false)->assertDontSee('<span>SOS</span>', false)->assertSee('Task')->assertSee('Group')->assertSee('Licence')->assertSee('Subscription')->assertSee('Payments')->assertSee('Support')->assertSee('Admin Profile')->assertDontSee('<span>My Profile</span>', false)->assertSee('Activity Log')->assertSee('Active Sessions')->assertSee('Error Log');
         }

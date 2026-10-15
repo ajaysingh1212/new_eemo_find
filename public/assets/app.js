@@ -43,6 +43,187 @@ document.querySelectorAll('[data-password-toggle]').forEach(button => {
         hideIcon.hidden = !visible;
     });
 });
+const loginLocationForm = document.querySelector('form[data-login-location]');
+if (loginLocationForm) {
+    const loginButton = loginLocationForm.querySelector('button[type="submit"], input[type="submit"]');
+    const note = document.getElementById('login-location-note');
+    const submitWithLocation = (permissionStatus, position = null) => {
+        loginLocationForm.elements.latitude.value = position ? position.coords.latitude : '';
+        loginLocationForm.elements.longitude.value = position ? position.coords.longitude : '';
+        loginLocationForm.elements.location_status.value = permissionStatus;
+        if (note) note.textContent = position
+            ? 'Location captured for this sign-in.'
+            : 'Location is unavailable; continuing sign-in without it.';
+        if (loginButton) loginButton.disabled = false;
+        loginLocationForm.dataset.locationReady = 'true';
+        loginLocationForm.requestSubmit();
+    };
+    loginLocationForm.addEventListener('submit', event => {
+        if (loginLocationForm.dataset.locationReady === 'true') return;
+        event.preventDefault();
+        if (loginLocationForm.dataset.locationPending === 'true') return;
+        loginLocationForm.dataset.locationPending = 'true';
+        if (loginButton) loginButton.disabled = true;
+        if (note) note.textContent = 'Requesting location permission…';
+        if (!navigator.geolocation) {
+            submitWithLocation('unavailable');
+            return;
+        }
+        navigator.geolocation.getCurrentPosition(
+            position => submitWithLocation('granted', position),
+            error => submitWithLocation(error.code === 1 ? 'denied' : 'unavailable'),
+            { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 }
+        );
+    });
+}
+
+(() => {
+    const weather = document.getElementById('admin-weather');
+    const locationButton = document.getElementById('admin-location-button');
+    if (!weather || !locationButton) return;
+
+    const temperature = document.getElementById('admin-weather-temperature');
+    const condition = document.getElementById('admin-weather-condition');
+    const feelsLike = document.getElementById('admin-weather-feels-like');
+    const humidity = document.getElementById('admin-weather-humidity');
+    const wind = document.getElementById('admin-weather-wind');
+    const locationLabel = document.getElementById('admin-weather-coordinates');
+    const status = document.getElementById('admin-weather-status');
+    const icons = [...document.querySelectorAll('#admin-weather-icon .icon')];
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+    let currentCoordinates = null;
+
+    const weatherDescription = code => {
+        if (code === 0) return ['Clear', 'sun'];
+        if ([1, 2].includes(code)) return ['Partly cloudy', 'cloud'];
+        if (code === 3) return ['Overcast', 'cloud'];
+        if ([45, 48].includes(code)) return ['Fog', 'cloud'];
+        if ([51, 53, 55, 56, 57].includes(code)) return ['Drizzle', 'cloud-rain'];
+        if ([61, 63, 65, 66, 67, 80, 81, 82, 95, 96, 99].includes(code)) return ['Rain / storm', 'cloud-rain'];
+        if ([71, 73, 75, 77, 85, 86].includes(code)) return ['Snow', 'cloud'];
+        return ['Current conditions', 'cloud'];
+    };
+
+    const showMessage = message => {
+        condition.textContent = message;
+        status.textContent = message;
+    };
+
+    const showWeather = async coordinates => {
+        currentCoordinates = coordinates;
+        showMessage('Loading weather…');
+        try {
+            const query = new URLSearchParams({
+                latitude: String(coordinates.latitude),
+                longitude: String(coordinates.longitude),
+                current: 'temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,weather_code',
+                temperature_unit: 'celsius',
+                timezone: 'auto',
+            });
+            const response = await fetch(`https://api.open-meteo.com/v1/forecast?${query}`);
+            if (!response.ok) throw new Error(`Weather service returned ${response.status}.`);
+            const result = await response.json();
+            if (typeof result.current?.temperature_2m !== 'number' || typeof result.current?.weather_code !== 'number') {
+                throw new Error('Weather service returned incomplete current conditions.');
+            }
+            const [description, iconName] = weatherDescription(result.current.weather_code);
+            temperature.textContent = `${Math.round(result.current.temperature_2m)}°C`;
+            feelsLike.textContent = typeof result.current.apparent_temperature === 'number'
+                ? `${Math.round(result.current.apparent_temperature)}°`
+                : '--°';
+            humidity.textContent = typeof result.current.relative_humidity_2m === 'number'
+                ? `${Math.round(result.current.relative_humidity_2m)}%`
+                : '--%';
+            wind.textContent = typeof result.current.wind_speed_10m === 'number'
+                ? `${Math.round(result.current.wind_speed_10m)} km/h`
+                : '-- km/h';
+            condition.textContent = description;
+            status.textContent = `Current weather: ${temperature.textContent}, ${description}. Feels like ${feelsLike.textContent}, humidity ${humidity.textContent}, wind ${wind.textContent}.`;
+            icons.forEach(icon => { icon.hidden = icon.dataset.weatherIcon !== iconName; });
+        } catch (error) {
+            showMessage('Weather unavailable');
+            console.error('Unable to load current weather from Open-Meteo.', error);
+        }
+    };
+
+    const saveLocation = async (permissionStatus, coordinates = null) => {
+        const payload = { permission_status: permissionStatus };
+        if (coordinates) {
+            payload.latitude = coordinates.latitude;
+            payload.longitude = coordinates.longitude;
+        }
+        const response = await fetch(weather.dataset.locationUrl, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+            },
+            body: JSON.stringify(payload),
+        });
+        if (!response.ok) throw new Error(`Unable to save location (HTTP ${response.status}).`);
+        const result = await response.json();
+        if (result.saved !== true) throw new Error('The server did not confirm the location update.');
+    };
+
+    const requestLocation = () => {
+        locationButton.disabled = true;
+        showMessage('Requesting location permission…');
+        if (!navigator.geolocation) {
+            saveLocation('unavailable')
+                .then(() => showMessage('Location is not supported by this browser.'))
+                .catch(error => {
+                    showMessage('Could not save location status');
+                    console.error('Unable to save location status.', error);
+                })
+                .finally(() => { locationButton.disabled = false; });
+            return;
+        }
+        navigator.geolocation.getCurrentPosition(async position => {
+            const coordinates = { latitude: position.coords.latitude, longitude: position.coords.longitude };
+            try {
+                await saveLocation('granted', coordinates);
+                weather.dataset.latitude = String(coordinates.latitude);
+                weather.dataset.longitude = String(coordinates.longitude);
+                locationLabel.textContent = `${coordinates.latitude.toFixed(4)}°, ${coordinates.longitude.toFixed(4)}°`;
+                await showWeather(coordinates);
+            } catch (error) {
+                showMessage('Could not save location');
+                console.error('Unable to save current location.', error);
+            } finally {
+                locationButton.disabled = false;
+            }
+        }, async error => {
+            const permissionStatus = error.code === 1 ? 'denied' : 'unavailable';
+            try {
+                await saveLocation(permissionStatus);
+                showMessage(permissionStatus === 'denied' ? 'Location permission denied' : 'Location unavailable');
+                if (currentCoordinates) await showWeather(currentCoordinates);
+            } catch (saveError) {
+                showMessage('Could not save location status');
+                console.error('Unable to save location status.', saveError);
+            } finally {
+                locationButton.disabled = false;
+            }
+        }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 });
+    };
+
+    locationButton.addEventListener('click', requestLocation);
+    icons[0] && (icons[0].dataset.weatherIcon = 'sun');
+    icons[1] && (icons[1].dataset.weatherIcon = 'cloud');
+    icons[2] && (icons[2].dataset.weatherIcon = 'cloud-rain');
+
+    const latitude = Number(weather.dataset.latitude);
+    const longitude = Number(weather.dataset.longitude);
+    if (weather.dataset.latitude !== '' && weather.dataset.longitude !== '' && Number.isFinite(latitude) && Number.isFinite(longitude)) {
+        showWeather({ latitude, longitude });
+    } else if (weather.dataset.permissionStatus === 'denied') {
+        showMessage('Location permission denied');
+    } else if (weather.dataset.permissionStatus === 'unavailable') {
+        showMessage('Location unavailable');
+    }
+})();
 document.querySelectorAll('[data-submenu-toggle]').forEach(toggle => {
     toggle.addEventListener('click', () => {
         const open = toggle.getAttribute('aria-expanded') === 'true';
@@ -224,7 +405,6 @@ if (trafficMap) {
             status: button.dataset.userStatus,
         }));
     });
-    document.querySelector('[data-open-edit-user]')?.click();
     fields.image.addEventListener('change', () => {
         const [file] = fields.image.files;
         if (previewUrl) URL.revokeObjectURL(previewUrl);

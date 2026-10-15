@@ -21,6 +21,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
     Route::middleware(['auth:admin', 'auth.session'])->group(function () {
         Route::post('logout', [AuthController::class, 'destroy'])->name('logout');
+        Route::post('session/location', [SessionController::class, 'location'])->name('session.location');
         Route::get('dashboard', DashboardController::class)->name('dashboard');
         Route::view('notifications', 'admin.blank', ['title' => 'Notification'])->name('notifications');
         Route::get('user-management/users', [UserController::class, 'index'])->name('user-management.users');

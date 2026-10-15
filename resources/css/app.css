@@ -288,3 +288,5 @@ dialog::backdrop{background:#233e2e59}
     .auth-shell{height:100vh;height:100svh;min-height:0;overflow:hidden}
     .auth-panel{height:min(720px,calc(100svh - clamp(32px,8vh,64px)))}
 }
+.auth-login-page .login-location-note{margin:-6px 0 0;color:#6e8098;font-size:11px;line-height:1.45}
+.auth-login-page .auth-stack .btn:disabled{opacity:.72;cursor:wait}

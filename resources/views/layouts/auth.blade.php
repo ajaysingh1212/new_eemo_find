@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><title>@yield('title') · Eemo-Find</title>@include('layouts.assets')</head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><meta name="csrf-token" content="{{ csrf_token() }}"><title>@yield('title') · Eemo-Find</title>@include('layouts.assets')</head>
 <body class="auth-shell @if(request()->routeIs('admin.login')) auth-login-page @endif">
 <svg class="auth-tech-bg" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
     <defs>

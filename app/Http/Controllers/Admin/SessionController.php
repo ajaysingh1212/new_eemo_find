@@ -30,6 +30,33 @@ class SessionController extends Controller
         return view('admin.security.active-sessions', compact('supported', 'sessions'));
     }
 
+    public function location(Request $request)
+    {
+        $data = $request->validate([
+            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
+            'permission_status' => ['required', 'in:granted,denied,unavailable,error'],
+        ]);
+        $hasLatitude = ($data['latitude'] ?? null) !== null;
+        $hasLongitude = ($data['longitude'] ?? null) !== null;
+        if ($hasLatitude !== $hasLongitude) {
+            return response()->json(['message' => 'Location coordinates are incomplete.'], 422);
+        }
+
+        $location = $request->session()->get('admin_location', []);
+        if (isset($data['latitude'], $data['longitude'])) {
+            $location['latitude'] = (float) $data['latitude'];
+            $location['longitude'] = (float) $data['longitude'];
+            $location['located_at'] = now()->toIso8601String();
+            $data['permission_status'] = 'granted';
+        }
+        $location['permission_status'] = $data['permission_status'];
+        $location['updated_at'] = now()->toIso8601String();
+        $request->session()->put('admin_location', $location);
+
+        return response()->json(['saved' => true]);
+    }
+
     public function destroy(Request $request, AdminSessionService $service, ActivityLogger $logger)
     {
         $data = $request->validate(['reference' => ['required', 'string', 'max:2048']]);

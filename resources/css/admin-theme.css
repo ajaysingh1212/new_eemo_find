@@ -280,6 +280,136 @@ body.admin-shell {
     font-size: 15px;
 }
 
+.admin-shell .topbar-start {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 18px;
+}
+
+.admin-shell .admin-weather {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 9px;
+    color: #48617f;
+}
+
+.admin-shell .admin-weather-icon {
+    display: grid;
+    width: 34px;
+    height: 34px;
+    flex: none;
+    place-items: center;
+    border-radius: 11px;
+    background: #eaf2ff;
+    color: #3476d4;
+}
+
+.admin-shell .admin-weather-icon .icon {
+    width: 19px;
+    height: 19px;
+}
+
+.admin-shell .admin-weather-copy {
+    display: grid;
+    min-width: 0;
+    gap: 1px;
+}
+
+.admin-shell .admin-weather-copy strong {
+    color: #203654;
+    font-size: 14px;
+    line-height: 1.1;
+}
+
+.admin-shell .admin-weather-copy small {
+    overflow: hidden;
+    max-width: 150px;
+    color: #7a8eaa;
+    font-size: 10px;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admin-shell .admin-weather-metrics {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: 4px;
+    padding-left: 12px;
+    border-left: 1px solid #dfe9f8;
+}
+
+.admin-shell .admin-weather-metrics > span {
+    display: grid;
+    gap: 2px;
+}
+
+.admin-shell .admin-weather-metrics small {
+    color: #8498b3;
+    font-size: 9px;
+    line-height: 1;
+}
+
+.admin-shell .admin-weather-metrics strong {
+    color: #48617f;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.1;
+    white-space: nowrap;
+}
+
+.admin-shell .admin-weather-location-divider {
+    width: 1px;
+    height: 30px;
+    flex: none;
+    margin: 0 2px 0 3px;
+    background: #dfe9f8;
+}
+
+.admin-shell .admin-weather-location {
+    display: grid;
+    min-width: 0;
+    gap: 2px;
+}
+
+.admin-shell .admin-weather-location strong {
+    overflow: hidden;
+    max-width: 145px;
+    color: #48617f;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admin-shell .admin-weather-location small {
+    overflow: hidden;
+    max-width: 145px;
+    color: #8498b3;
+    font-size: 9px;
+    line-height: 1.1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admin-shell .admin-location-button {
+    width: 34px;
+    height: 34px;
+    flex: none;
+    border-radius: 11px;
+    background: #eaf2ff;
+    color: #3476d4;
+}
+
+.admin-shell .admin-location-button .icon {
+    width: 17px;
+    height: 17px;
+}
+
 .admin-shell .breadcrumbs [aria-current] {
     color: #28476e;
 }
@@ -316,31 +446,11 @@ body.admin-shell {
     background: #dfe9f8;
 }
 
-.admin-shell .topbar-search {
-    color: #6f86a3;
-    background: #f3f8ff;
-    border-color: #dfeaff;
-}
-
-.admin-shell .topbar-search input {
-    color: #18324d;
-    font-size: 14px;
-}
-
-.admin-shell .topbar-search input::placeholder {
-    color: #8ba0bb;
-}
-
-.admin-shell .topbar-search button {
-    color: #1c6ad0;
-}
-
-.admin-shell .topbar-search button:hover {
-    color: #114ea7;
-    background: #e2efff;
-}
-
 @media (max-width: 650px) {
+    .admin-shell .admin-weather {
+        display: none;
+    }
+
     .admin-shell .topbar-end .topbar-name {
         max-width: 82px;
         font-size: 12px;
@@ -350,8 +460,72 @@ body.admin-shell {
         font-size: 12px;
     }
 
-    .admin-shell .topbar-search input {
+    .admin-shell .topbar-start {
+        gap: 8px;
+    }
+
+    .admin-shell .admin-weather {
+        gap: 5px;
+    }
+
+    .admin-shell .admin-weather-metrics {
+        gap: 6px;
+        margin-left: 1px;
+        padding-left: 7px;
+    }
+
+    .admin-shell .admin-weather-metrics small {
+        font-size: 8px;
+    }
+
+    .admin-shell .admin-weather-metrics strong {
+        font-size: 9px;
+    }
+
+    .admin-shell .admin-weather-location-divider {
+        height: 25px;
+        margin-inline: 0;
+    }
+
+    .admin-shell .admin-weather-location strong {
+        max-width: 85px;
+        font-size: 8px;
+    }
+
+    .admin-shell .admin-weather-location small {
+        max-width: 85px;
+        font-size: 8px;
+    }
+
+    .admin-shell .admin-weather-icon {
+        width: 29px;
+        height: 29px;
+        border-radius: 9px;
+    }
+
+    .admin-shell .admin-weather-icon .icon {
+        width: 16px;
+        height: 16px;
+    }
+
+    .admin-shell .admin-weather-copy strong {
         font-size: 12px;
+    }
+
+    .admin-shell .admin-weather-copy small {
+        max-width: 92px;
+        font-size: 9px;
+    }
+
+    .admin-shell .admin-location-button {
+        width: 29px;
+        height: 29px;
+        border-radius: 9px;
+    }
+
+    .admin-shell .admin-location-button .icon {
+        width: 16px;
+        height: 16px;
     }
 }
 
