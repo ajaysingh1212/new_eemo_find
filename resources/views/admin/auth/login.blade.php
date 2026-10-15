@@ -5,7 +5,7 @@
 <x-alert />
 <form method="POST" action="{{ route('admin.login.store') }}" class="stack auth-stack">@csrf
 <x-field name="email" label="Email address" type="email" placeholder="you@example.com" autocomplete="username" required autofocus />
-<x-field name="password" label="Password" type="password" placeholder="Enter your password" autocomplete="current-password" required />
+<x-field name="password" label="Password" type="password" placeholder="Enter your password" autocomplete="current-password" toggleable required />
 <div class="auth-options"><span class="muted"><x-icon name="lock" /> Secure sign-in</span><a href="{{ route('admin.password.request') }}">Forgot password?</a></div>
 <x-button class="btn-full">Sign in to workspace <x-icon name="arrow" /></x-button>
 </form>

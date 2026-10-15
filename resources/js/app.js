@@ -31,6 +31,18 @@ document.addEventListener('keydown', event => {
 });
 window.addEventListener('resize', closeSidebar);
 closeSidebar();
+document.querySelectorAll('[data-password-toggle]').forEach(button => {
+    const input = document.getElementById(button.dataset.passwordToggle);
+    const [showIcon, hideIcon] = button.querySelectorAll('.icon');
+    button.addEventListener('click', () => {
+        const visible = input.type === 'password';
+        input.type = visible ? 'text' : 'password';
+        button.setAttribute('aria-label', visible ? 'Hide password' : 'Show password');
+        button.setAttribute('aria-pressed', String(visible));
+        showIcon.hidden = visible;
+        hideIcon.hidden = !visible;
+    });
+});
 document.querySelectorAll('[data-submenu-toggle]').forEach(toggle => {
     toggle.addEventListener('click', () => {
         const open = toggle.getAttribute('aria-expanded') === 'true';

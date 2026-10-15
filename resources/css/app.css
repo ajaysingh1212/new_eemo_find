@@ -143,6 +143,12 @@ dialog::backdrop{background:#233e2e59}
 .auth-options{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:2px}.auth-options .muted{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:#4f6a87}.auth-options .icon{width:13px;height:13px}.auth-options a{font-size:11px;color:#1c6ad0;font-weight:700}.auth-options a:hover{color:#114ea7}
 .field{display:grid;gap:8px}
 .field label{font-size:12px;font-weight:700;color:#28476e}
+.field-input-wrap{position:relative}
+.field-input-wrap .input{width:100%;padding-right:48px}
+.password-toggle{position:absolute;top:50%;right:12px;display:grid;place-items:center;width:28px;height:28px;padding:0;transform:translateY(-50%);border:0;border-radius:8px;background:transparent;color:#6f84a0}
+.password-toggle:hover{background:#e8f1ff;color:#245da8}
+.password-toggle:focus-visible{outline:3px solid #4388f5;outline-offset:2px}
+.password-toggle .icon{width:17px;height:17px}
 .input{background:linear-gradient(180deg,#ffffff,#f4f9ff);border:1px solid #dfeaff;color:#18324d;border-radius:15px;min-height:50px;padding:0 14px;box-shadow:inset 0 1px 0 rgba(255,255,255,.7)}
 .input::placeholder{color:#8ba0bb}
 .input:hover{border-color:#bfd7ff}.input:focus{border-color:#4f8ef7;box-shadow:0 0 0 4px rgba(79,142,247,.12)}
