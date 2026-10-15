@@ -28,8 +28,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('user-management/users/{user}', [UserController::class, 'update'])->name('user-management.users.update');
         Route::get('user-management/devices', [UserController::class, 'devices'])->name('user-management.devices');
         Route::view('user-management/reports', 'admin.blank', ['title' => 'Reports'])->name('user-management.reports');
-        Route::view('tracking/live-location', 'admin.blank', ['title' => 'Live Location'])->name('tracking.live-location');
-        Route::view('tracking/history', 'admin.blank', ['title' => 'History'])->name('tracking.history');
+        Route::view('tracking/live-location', 'admin.tracking.live-location')->name('tracking.live-location');
         Route::view('tracking/geo-fence', 'admin.blank', ['title' => 'Geofence'])->name('tracking.geo-fence');
         Route::view('tracking/task', 'admin.blank', ['title' => 'Task'])->name('tracking.task');
         Route::view('tracking/sos', 'admin.blank', ['title' => 'SOS'])->name('tracking.sos');

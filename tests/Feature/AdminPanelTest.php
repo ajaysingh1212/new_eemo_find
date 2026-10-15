@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Admin;
 use App\Models\AdminActivityLog;
+use App\Models\Device;
 use App\Models\User;
 use App\Services\ActivityLogger;
 use App\Services\BrandingService;
@@ -82,6 +83,33 @@ class AdminPanelTest extends TestCase
 
         $this->assertNull($optionalUser->ip_address);
         $this->assertNull($optionalUser->login_device);
+    }
+
+    public function test_devices_have_manufacturer_model_uuid_firmware_and_user_relationship(): void
+    {
+        $this->assertTrue(Schema::hasTable('devices'));
+        $this->assertTrue(Schema::hasColumns('devices', [
+            'user_id',
+            'manufacturer',
+            'device_model',
+            'device_uuid',
+            'firmware_version',
+        ]));
+
+        $user = User::factory()->create();
+        $device = Device::factory()->for($user)->create([
+            'manufacturer' => 'Eemo',
+            'device_model' => 'GT06',
+            'device_uuid' => 'eemo-device-uuid-001',
+            'firmware_version' => '1.2.3',
+        ]);
+
+        $this->assertSame($user->id, $device->user->id);
+        $this->assertTrue($user->devices->contains('id', $device->id));
+        $this->assertSame('Eemo', $device->manufacturer);
+        $this->assertSame('GT06', $device->device_model);
+        $this->assertSame('eemo-device-uuid-001', $device->device_uuid);
+        $this->assertSame('1.2.3', $device->firmware_version);
     }
 
     public function test_admin_can_create_and_store_user_records_only(): void
@@ -255,7 +283,7 @@ class AdminPanelTest extends TestCase
 
     public function test_all_private_pages_redirect_guests(): void
     {
-        foreach (['dashboard', 'notifications', 'user-management/users', 'user-management/devices', 'user-management/reports', 'tracking/live-location', 'tracking/history', 'tracking/geo-fence', 'tracking/task', 'groups', 'licence', 'licence/subscription', 'licence/payments', 'support', 'profile', 'security/activity-logs', 'security/activity-logs/1', 'security/active-sessions', 'security/error-log'] as $path) {
+        foreach (['dashboard', 'notifications', 'user-management/users', 'user-management/devices', 'user-management/reports', 'tracking/live-location', 'tracking/geo-fence', 'tracking/task', 'groups', 'licence', 'licence/subscription', 'licence/payments', 'support', 'profile', 'security/activity-logs', 'security/activity-logs/1', 'security/active-sessions', 'security/error-log'] as $path) {
             $this->get('/admin/'.$path)->assertRedirect(route('admin.login'));
         }
     }
@@ -339,15 +367,27 @@ class AdminPanelTest extends TestCase
         $response = $this->get('/admin/dashboard');
         $response->assertOk()->assertSee('class="auth-tech-bg"', false)->assertSee('class="auth-circuit-flow"', false)->assertSee('aria-label="GPS tracking map of India"', false)->assertSee('id="admin-traffic-map"', false)->assertDontSee('SAMPLE DATA')->assertSee('Total devices')->assertSee('1,284')->assertSee('1,126 active')->assertSee('158 inactive')->assertSee('User licenses')->assertSee('620')->assertSee('572 active')->assertSee('48 expired')->assertSee('Users online')->assertSee('184')->assertSee('Users offline')->assertSee('936')->assertDontSee('Ferry arrival')->assertDontSee('Train speed')->assertDontSee('Recent activity')->assertDontSee('Your account')->assertSee($admin->name)->assertSee('127.0.0.1')->assertSee('sidebar-admin-ip')->assertSee('brand-live-clock')->assertDontSee('sidebar-admin-clock')->assertSee('data-clock', false)->assertSee('data-timezone', false)->assertSee('Live Now')->assertDontSee('Realtime')->assertDontSee('Admin access');
         $this->assertStringContainsString('https://*.googleapis.com', $response->headers->get('Content-Security-Policy'));
-        foreach (['profile', 'security/activity-logs', 'security/active-sessions', 'security/error-log', 'notifications', 'user-management/users', 'user-management/devices', 'user-management/reports', 'tracking/live-location', 'tracking/history', 'tracking/geo-fence', 'tracking/task', 'tracking/sos', 'groups', 'licence', 'licence/subscription', 'licence/payments', 'support'] as $path) {
-            $this->get('/admin/'.$path)->assertOk()->assertSee('Eemo')->assertSee('Notification')->assertSee('User & Account')->assertSee('User')->assertSee('Device')->assertSee('Reports')->assertSee('Tracking')->assertSee('Live Location')->assertSee('History')->assertSee('Geofence')->assertSee('Task')->assertSee('SOS')->assertSee('Group')->assertSee('Licence')->assertSee('Subscription')->assertSee('Payments')->assertSee('Support')->assertSee('Admin Profile')->assertDontSee('<span>My Profile</span>', false)->assertSee('Activity Log')->assertSee('Active Sessions')->assertSee('Error Log');
+        foreach (['profile', 'security/activity-logs', 'security/active-sessions', 'security/error-log', 'notifications', 'user-management/users', 'user-management/devices', 'user-management/reports', 'tracking/live-location', 'tracking/geo-fence', 'tracking/task', 'tracking/sos', 'groups', 'licence', 'licence/subscription', 'licence/payments', 'support'] as $path) {
+            $this->get('/admin/'.$path)->assertOk()->assertSee('Eemo')->assertSee('Notification')->assertSee('User & Account')->assertSee('User')->assertSee('Device')->assertSee('Reports')->assertSee('Tracking')->assertSee('Live &amp; History', false)->assertSee('Geofence &amp; SOS', false)->assertDontSee('<span>SOS</span>', false)->assertSee('Task')->assertSee('Group')->assertSee('Licence')->assertSee('Subscription')->assertSee('Payments')->assertSee('Support')->assertSee('Admin Profile')->assertDontSee('<span>My Profile</span>', false)->assertSee('Activity Log')->assertSee('Active Sessions')->assertSee('Error Log');
         }
         $this->get('/admin/notifications')->assertSee('Notification</span>', false)->assertDontSee('<h1', false);
         $this->get('/admin/user-management/users')->assertSee('User</span>', false)->assertDontSee('<h1', false);
         $this->get('/admin/user-management/devices')->assertSee('Device</span>', false)->assertDontSee('<h1', false);
         $this->get('/admin/user-management/reports')->assertSee('Reports</span>', false)->assertDontSee('<h1', false);
-        $this->get('/admin/tracking/live-location')->assertSee('Live Location</span>', false)->assertDontSee('<h1', false);
-        $this->get('/admin/tracking/history')->assertSee('History</span>', false)->assertDontSee('<h1', false);
+        $this->get('/admin/tracking/live-location')
+            ->assertSee('Live Location</span>', false)
+            ->assertSee('Current location')
+            ->assertSee('Route history')
+            ->assertSee('class="location-map location-map-current"', false)
+            ->assertSee('class="location-map location-map-route"', false)
+            ->assertSee('28.6129° N, 77.2295° E')
+            ->assertSee('18.6 km')
+            ->assertSee('sample demo data')
+            ->assertDontSee('TRACKING / GPS')
+            ->assertDontSee('View a device’s current position and its recent route history.')
+            ->assertDontSee('class="demo-data-badge"', false)
+            ->assertDontSee('<h1 id="live-location-title">Live Location</h1>', false);
+        $this->get('/admin/tracking/history')->assertNotFound();
         $this->get('/admin/tracking/geo-fence')->assertSee('Geofence</span>', false)->assertDontSee('<h1', false);
         $this->get('/admin/tracking/task')->assertSee('Task</span>', false)->assertDontSee('<h1', false);
         $this->get('/admin/tracking/sos')->assertSee('SOS</span>', false)->assertDontSee('<h1', false);

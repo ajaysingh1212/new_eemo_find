@@ -10,5 +10,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         User::factory()->count(8)->create();
+
+        $this->call(DeviceSeeder::class);
     }
 }
