@@ -19,15 +19,22 @@ class SessionController extends Controller
         $sessions = $supported ? $service->query($request->user('admin'))
             ->where('last_activity', '>=', now()->subMinutes(config('session.lifetime'))->timestamp)
             ->orderByDesc('last_activity')->get()->map(function ($session) use ($request) {
+                $location = $this->sessionLocation($session->payload);
+
                 return [
                     'reference' => Crypt::encryptString($session->id),
                     'current' => hash_equals($request->session()->getId(), $session->id),
                     'ip' => $session->ip_address, 'agent' => $session->user_agent,
                     'last_activity' => Carbon::createFromTimestamp($session->last_activity),
+                    'location' => $location,
                 ];
             }) : collect();
 
-        return view('admin.security.active-sessions', compact('supported', 'sessions'));
+        return view('admin.security.active-sessions', [
+            'supported' => $supported,
+            'sessions' => $sessions,
+            'admin' => $request->user('admin'),
+        ]);
     }
 
     public function location(Request $request)
@@ -80,5 +87,41 @@ class SessionController extends Controller
         }
 
         return back()->with('status', 'Session revoked.');
+    }
+
+    private function sessionLocation(string $payload): array
+    {
+        $data = base64_decode($payload, true);
+        if ($data === false) {
+            return [];
+        }
+
+        if (config('session.encrypt')) {
+            try {
+                $data = Crypt::decrypt($data);
+            } catch (DecryptException) {
+                return [];
+            }
+        }
+
+        $attributes = config('session.serialization', 'php') === 'json'
+            ? json_decode($data, true)
+            : @unserialize($data, ['allowed_classes' => false]);
+
+        $location = is_array($attributes) ? ($attributes['admin_location'] ?? null) : null;
+        if (! is_array($location)
+            || ! isset($location['latitude'], $location['longitude'])
+            || ! is_numeric($location['latitude'])
+            || ! is_numeric($location['longitude'])) {
+            return [];
+        }
+
+        $latitude = (float) $location['latitude'];
+        $longitude = (float) $location['longitude'];
+        if ($latitude < -90 || $latitude > 90 || $longitude < -180 || $longitude > 180) {
+            return [];
+        }
+
+        return ['latitude' => $latitude, 'longitude' => $longitude];
     }
 }

@@ -739,10 +739,19 @@ class AdminPanelTest extends TestCase
         config(['session.driver' => 'database']);
         $admin = Admin::factory()->create();
         $other = Admin::factory()->create();
-        $this->sessionRow($admin, 'raw-session-secret', 'Browser A');
+        $this->sessionRow($admin, 'raw-session-secret', 'Browser A', null, [
+            'latitude' => 37.7749,
+            'longitude' => -122.4194,
+            'permission_status' => 'granted',
+        ]);
+        $this->sessionRow($admin, 'location-not-shared', 'Browser without location');
         $this->sessionRow($other, 'other-secret', 'Other admin browser');
         $this->sessionRow($admin, 'expired-secret', 'Expired browser', now()->subHours(3)->timestamp);
         $this->actingAs($admin, 'admin')->get('/admin/security/active-sessions')->assertOk()->assertSee('Browser A')
+            ->assertSee($admin->name)->assertSee('Other session')->assertSee('37.77490, -122.41940')
+            ->assertSee('maps.google.com/maps?q=37.7749,-122.4194', false)
+            ->assertSee('name="reference"', false)->assertSee('Log out other session')
+            ->assertSee('Location not shared by browser')->assertSee('Precise location unavailable')
             ->assertDontSee('raw-session-secret')->assertDontSee('Other admin browser')->assertDontSee('Expired browser');
     }
 
@@ -842,11 +851,19 @@ class AdminPanelTest extends TestCase
         $this->get('/admin/login')->assertOk()->assertHeader('X-Frame-Options', 'DENY')->assertHeader('X-Content-Type-Options', 'nosniff')->assertHeader('Cache-Control', 'no-store, private');
     }
 
-    private function sessionRow(Admin $admin, string $id, string $agent = 'Test Browser', ?int $last = null): void
+    private function sessionRow(Admin $admin, string $id, string $agent = 'Test Browser', ?int $last = null, ?array $location = null): void
     {
+        $attributes = $location === null ? [] : ['admin_location' => $location];
+        $payload = config('session.serialization', 'php') === 'json'
+            ? json_encode($attributes, JSON_THROW_ON_ERROR)
+            : serialize($attributes);
+        if (config('session.encrypt')) {
+            $payload = Crypt::encrypt($payload);
+        }
+
         DB::table('sessions')->updateOrInsert(['id' => $id], [
             'user_id' => $admin->id, 'ip_address' => '127.0.0.1', 'user_agent' => $agent,
-            'payload' => base64_encode(serialize([])), 'last_activity' => $last ?? now()->timestamp,
+            'payload' => base64_encode($payload), 'last_activity' => $last ?? now()->timestamp,
         ]);
     }
 }
