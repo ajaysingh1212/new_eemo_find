@@ -46,10 +46,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('profile/password', [ProfileController::class, 'password'])->name('profile.password.update');
         Route::put('profile/logo', [ProfileController::class, 'logo'])->middleware('can:manage-branding')->name('profile.logo.update');
         Route::delete('profile/logo', [ProfileController::class, 'removeLogo'])->middleware('can:manage-branding')->name('profile.logo.delete');
-        Route::get('security/activity-logs', [ActivityLogController::class, 'index'])->name('security.activity-logs.index');
-        Route::get('security/activity-logs/{activityLog}', [ActivityLogController::class, 'show'])->name('security.activity-logs.show');
+        Route::get('developer/activity-logs', [ActivityLogController::class, 'index'])->name('developer.activity-logs.index');
+        Route::get('developer/activity-logs/{activityLog}', [ActivityLogController::class, 'show'])->name('developer.activity-logs.show');
         Route::get('security/active-sessions', [SessionController::class, 'index'])->name('security.active-sessions.index');
-        Route::view('security/error-log', 'admin.blank', ['title' => 'Error Log'])->name('security.error-log');
+        Route::view('developer/mobile-app', 'admin.blank', ['title' => 'Mobile App'])->name('developer.mobile-app');
+        Route::view('developer/settings', 'admin.blank', ['title' => 'Settings'])->name('developer.settings');
+        Route::view('developer/error-log', 'admin.blank', ['title' => 'Error Log'])->name('developer.error-log');
+        Route::view('security/developer-mode', 'admin.blank', ['title' => 'Developer'])->name('security.developer-mode');
         // Opaque encrypted references are submitted in the body, never raw session IDs.
         Route::delete('security/active-sessions', [SessionController::class, 'destroy'])->name('security.active-sessions.destroy');
     });

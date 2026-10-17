@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 @section('title', 'Event Details')
 @section('content')
-<div class="page-heading"><div><span class="eyebrow">SECURITY / ACTIVITY LOG</span><h1>Event details<span class="heading-dot">.</span></h1><p>A closer look at this account action.</p></div><a class="btn btn-secondary" href="{{ route('admin.security.activity-logs.index') }}">Back to activity log</a></div>
+<div class="page-heading"><div><span class="eyebrow">DEVELOPER / ACTIVITY LOG</span><h1>Event details<span class="heading-dot">.</span></h1><p>A closer look at this account action.</p></div><a class="btn btn-secondary" href="{{ route('admin.developer.activity-logs.index') }}">Back to activity log</a></div>
 <x-card title="Audit event"><dl class="detail-list">
 <div><dt>Event type</dt><dd><span class="event-badge">{{ $log->action }}</span></dd></div>
 <div><dt>Description</dt><dd>{{ $log->description }}</dd></div>

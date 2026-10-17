@@ -336,7 +336,7 @@ class AdminPanelTest extends TestCase
 
     public function test_all_private_pages_redirect_guests(): void
     {
-        foreach (['dashboard', 'notifications', 'user-management/users', 'user-management/devices', 'user-management/reports', 'tracking/live-location', 'tracking/geo-fence', 'tracking/task', 'groups', 'licence', 'licence/subscription', 'licence/payments', 'support', 'profile', 'security/activity-logs', 'security/activity-logs/1', 'security/active-sessions', 'security/error-log'] as $path) {
+        foreach (['dashboard', 'notifications', 'user-management/users', 'user-management/devices', 'user-management/reports', 'tracking/live-location', 'tracking/geo-fence', 'tracking/task', 'groups', 'licence', 'licence/subscription', 'licence/payments', 'support', 'profile', 'developer/activity-logs', 'developer/activity-logs/1', 'security/active-sessions', 'developer/error-log', 'security/developer-mode'] as $path) {
             $this->get('/admin/'.$path)->assertRedirect(route('admin.login'));
         }
     }
@@ -484,8 +484,8 @@ class AdminPanelTest extends TestCase
         $this->assertStringContainsString('https://*.googleapis.com', $response->headers->get('Content-Security-Policy'));
         $this->assertStringContainsString('https://api.open-meteo.com', $response->headers->get('Content-Security-Policy'));
         $this->assertSame('camera=(), microphone=(), geolocation=(self)', $response->headers->get('Permissions-Policy'));
-        foreach (['profile', 'security/activity-logs', 'security/active-sessions', 'security/error-log', 'notifications', 'user-management/users', 'user-management/devices', 'user-management/reports', 'tracking/live-location', 'tracking/geo-fence', 'tracking/task', 'tracking/sos', 'groups', 'licence', 'licence/subscription', 'licence/payments', 'support'] as $path) {
-            $this->get('/admin/'.$path)->assertOk()->assertSee('Eemo')->assertSee('Notification</span>', false)->assertSee('<span>SOS &amp; Alert</span>', false)->assertSee('User & Account')->assertSee('User')->assertSee('Device')->assertDontSee('<span>Reports</span>', false)->assertSee('Tracking')->assertSee('Live &amp; History', false)->assertSee('<span>Geofence</span>', false)->assertDontSee('Geofence &amp; SOS', false)->assertDontSee('<span>SOS</span>', false)->assertDontSee('<span>Alert</span>', false)->assertSee('Task')->assertSee('Group')->assertSee('Licence')->assertSee('Subscription')->assertSee('Payments')->assertSee('Support')->assertSee('Admin Profile')->assertDontSee('<span>My Profile</span>', false)->assertSee('Activity Log')->assertSee('Active Sessions')->assertSee('Error Log');
+        foreach (['profile', 'developer/activity-logs', 'security/active-sessions', 'developer/error-log', 'developer/mobile-app', 'developer/settings', 'security/developer-mode', 'notifications', 'user-management/users', 'user-management/devices', 'user-management/reports', 'tracking/live-location', 'tracking/geo-fence', 'tracking/task', 'tracking/sos', 'groups', 'licence', 'licence/subscription', 'licence/payments', 'support'] as $path) {
+            $this->get('/admin/'.$path)->assertOk()->assertSee('Eemo')->assertSee('Notification</span>', false)->assertSee('<span>SOS &amp; Alert</span>', false)->assertSee('User & Account')->assertSee('User')->assertSee('Device')->assertDontSee('<span>Reports</span>', false)->assertSee('Tracking')->assertSee('Live &amp; History', false)->assertSee('<span>Geofence</span>', false)->assertDontSee('Geofence &amp; SOS', false)->assertDontSee('<span>SOS</span>', false)->assertDontSee('<span>Alert</span>', false)->assertSee('Task')->assertSee('Group')->assertSee('Licence')->assertSee('Subscription')->assertSee('Payments')->assertSee('Support')->assertSee('Admin Profile')->assertDontSee('<span>My Profile</span>', false)->assertSee('Activity Log')->assertSee('Active Sessions')->assertSee('Error Log')->assertSee('<span>Developer</span>', false)->assertDontSee('<span>Developer Mode</span>', false);
         }
         $this->get('/admin/notifications')->assertSee('Notification</span>', false)->assertDontSee('<h1', false);
         $this->get('/admin/user-management/users')->assertSee('User</span>', false)->assertDontSee('<h1', false);
@@ -513,7 +513,41 @@ class AdminPanelTest extends TestCase
         $this->get('/admin/licence/subscription')->assertSee('Subscription</span>', false)->assertDontSee('<h1', false);
         $this->get('/admin/licence/payments')->assertSee('Payments</span>', false)->assertDontSee('<h1', false);
         $this->get('/admin/support')->assertSee('Support</span>', false)->assertDontSee('<h1', false);
-        $this->get('/admin/security/error-log')->assertSee('Error Log</span>', false)->assertDontSee('<h1', false);
+        $activityLogs = $this->get('/admin/developer/activity-logs')
+            ->assertSee('Activity Log</span>', false)
+            ->assertSee('>Developer</span>', false)
+            ->assertSee('<h1>Activity Log', false);
+        $developerMode = $this->get('/admin/security/developer-mode')
+            ->assertSee('Developer</span>', false)
+            ->assertDontSee('<h1', false);
+        $content = $developerMode->getContent();
+        $this->assertStringContainsString('id="developer-submenu"', $content);
+        $securitySubmenuEnd = strpos($content, '</div>', strpos($content, 'id="security-submenu"'));
+        $developerMenuPosition = strpos($content, 'id="developer-toggle"');
+        $this->assertGreaterThan($securitySubmenuEnd, $developerMenuPosition);
+        $developerSubmenuStart = strpos($content, 'id="developer-submenu"');
+        $developerSubmenuEnd = strpos($content, '</div>', $developerSubmenuStart);
+        $developerSubmenu = substr($content, $developerSubmenuStart, $developerSubmenuEnd - $developerSubmenuStart);
+        $this->assertStringContainsString('href="'.route('admin.developer.activity-logs.index').'"', $developerSubmenu);
+        $this->assertStringContainsString('href="'.route('admin.developer.error-log').'"', $developerSubmenu);
+        $this->assertStringContainsString('href="'.route('admin.developer.mobile-app').'"', $developerSubmenu);
+        $this->assertStringContainsString('href="'.route('admin.developer.settings').'"', $developerSubmenu);
+        $this->assertLessThan(
+            strpos($developerSubmenu, 'href="'.route('admin.developer.mobile-app').'"'),
+            strpos($developerSubmenu, 'href="'.route('admin.developer.settings').'"')
+        );
+        $this->assertLessThan(
+            strpos($developerSubmenu, 'href="'.route('admin.developer.activity-logs.index').'"'),
+            strpos($developerSubmenu, 'href="'.route('admin.developer.mobile-app').'"')
+        );
+        $this->assertLessThan(
+            strpos($developerSubmenu, 'href="'.route('admin.developer.error-log').'"'),
+            strpos($developerSubmenu, 'href="'.route('admin.developer.activity-logs.index').'"')
+        );
+        $this->assertStringNotContainsString('href="'.route('admin.security.developer-mode').'"', $developerSubmenu);
+        $this->assertStringNotContainsString('href="'.route('admin.developer.activity-logs.index').'"', substr($content, strpos($content, 'id="security-submenu"'), strpos($content, 'id="developer-toggle"') - strpos($content, 'id="security-submenu"')));
+        $this->get('/admin/developer/mobile-app')->assertSee('Mobile App</span>', false)->assertSee('Mobile App')->assertDontSee('<h1', false);
+        $this->get('/admin/developer/settings')->assertSee('Settings</span>', false)->assertSee('Settings')->assertDontSee('<h1', false);
     }
 
     public function test_profile_update_normalizes_email_and_excludes_privilege_input(): void
@@ -665,9 +699,9 @@ class AdminPanelTest extends TestCase
         ]);
         $this->assertSame(['changed_fields' => ['name', 'email']], $log->metadata);
         $this->assertStringNotContainsString('do-not-record', $log->toJson());
-        $this->actingAs($admin, 'admin')->get('/admin/security/activity-logs/'.$log->id)->assertOk()->assertSee('Updated profile information');
-        $this->delete('/admin/security/activity-logs/'.$log->id)->assertStatus(405);
-        $this->patch('/admin/security/activity-logs/'.$log->id)->assertStatus(405);
+        $this->actingAs($admin, 'admin')->get('/admin/developer/activity-logs/'.$log->id)->assertOk()->assertSee('Updated profile information');
+        $this->delete('/admin/developer/activity-logs/'.$log->id)->assertStatus(405);
+        $this->patch('/admin/developer/activity-logs/'.$log->id)->assertStatus(405);
     }
 
     public function test_regular_admin_cannot_read_other_admin_audit_records_or_bypass_search_scope(): void
@@ -675,9 +709,9 @@ class AdminPanelTest extends TestCase
         $admin = Admin::factory()->create();
         $other = Admin::factory()->create();
         $log = app(ActivityLogger::class)->log('password.changed', $other);
-        $this->actingAs($admin, 'admin')->get('/admin/security/activity-logs/'.$log->id)->assertForbidden();
-        $this->get('/admin/security/activity-logs?search=password')->assertOk()->assertDontSee('password.changed');
-        $this->get('/admin/security/activity-logs?admin_id='.$other->id)->assertOk()->assertDontSee($other->name);
+        $this->actingAs($admin, 'admin')->get('/admin/developer/activity-logs/'.$log->id)->assertForbidden();
+        $this->get('/admin/developer/activity-logs?search=password')->assertOk()->assertDontSee('password.changed');
+        $this->get('/admin/developer/activity-logs?admin_id='.$other->id)->assertOk()->assertDontSee($other->name);
     }
 
     public function test_super_admin_audit_filters_pagination_and_escaped_output(): void
@@ -686,18 +720,18 @@ class AdminPanelTest extends TestCase
         for ($i = 0; $i < 18; $i++) {
             app(ActivityLogger::class)->log('login.success', $admin);
         }
-        $this->actingAs($admin, 'admin')->get('/admin/security/activity-logs?search=login&admin_id='.$admin->id.'&from='.now()->format('Y-m-d').'&to='.now()->format('Y-m-d'))
+        $this->actingAs($admin, 'admin')->get('/admin/developer/activity-logs?search=login&admin_id='.$admin->id.'&from='.now()->format('Y-m-d').'&to='.now()->format('Y-m-d'))
             ->assertOk()->assertSee('18 events')->assertSee('Page 1 of 2')->assertSee('&lt;script&gt;', false)->assertDontSee('<script>alert(1)</script>', false);
-        $this->get('/admin/security/activity-logs?from=invalid')->assertSessionHasErrors('from');
+        $this->get('/admin/developer/activity-logs?from=invalid')->assertSessionHasErrors('from');
     }
 
     public function test_date_filters_allow_either_bound_independently_and_reject_reversed_range(): void
     {
         $admin = Admin::factory()->create(['is_super_admin' => true]);
         $this->actingAs($admin, 'admin');
-        $this->get('/admin/security/activity-logs?to='.now()->format('Y-m-d'))->assertOk()->assertSessionHasNoErrors();
-        $this->get('/admin/security/activity-logs?from='.now()->format('Y-m-d'))->assertOk()->assertSessionHasNoErrors();
-        $this->get('/admin/security/activity-logs?from=2026-10-12&to=2026-10-01')->assertSessionHasErrors('to');
+        $this->get('/admin/developer/activity-logs?to='.now()->format('Y-m-d'))->assertOk()->assertSessionHasNoErrors();
+        $this->get('/admin/developer/activity-logs?from='.now()->format('Y-m-d'))->assertOk()->assertSessionHasNoErrors();
+        $this->get('/admin/developer/activity-logs?from=2026-10-12&to=2026-10-01')->assertSessionHasErrors('to');
     }
 
     public function test_sessions_are_scoped_and_ids_are_not_rendered(): void
