@@ -5,7 +5,7 @@
 @section('content')
 @php($device = $user->devices->first())
 <section class="user-detail-page">
-    <a class="user-detail-back" href="{{ route('admin.user-management.users') }}"><x-icon name="arrow" /> Back to users</a>
+    <a class="user-detail-back" href="{{ route('admin.user-management.devices') }}"><x-icon name="arrow" /> Back to devices</a>
 
     <header class="user-detail-hero">
         <div class="user-detail-avatar-wrap">
@@ -36,15 +36,15 @@
                 </div>
                 <dl class="user-detail-list">
                     @if ($device)
-                        <div><dt>Device name</dt><dd>Eemo Tracker</dd></div>
-                        <div><dt>Manufacturer / Brand</dt><dd>{{ $device->manufacturer }}</dd></div>
-                        <div><dt>Device model</dt><dd>{{ $device->device_model }}</dd></div>
-                        <div><dt>Device ID / UUID</dt><dd class="user-detail-mono">{{ $device->device_uuid }}</dd></div>
+                        <div><dt>Device name</dt><dd>Unknown</dd></div>
+                        <div><dt>Manufacturer / Brand</dt><dd>{{ $device->manufacturer ?: 'Unknown' }}</dd></div>
+                        <div><dt>Device model</dt><dd>{{ $device->device_model ?: 'Unknown' }}</dd></div>
+                        <div><dt>Device ID / UUID</dt><dd class="user-detail-mono">{{ str_starts_with($device->device_uuid ?? '', 'Pending-') ? 'Unknown' : ($device->device_uuid ?: 'Unknown') }}</dd></div>
                         <div><dt>Firmware version</dt><dd>{{ $device->firmware_version ?: 'Not available' }}</dd></div>
-                        <div><dt>Network</dt><dd>Airtel 4G</dd></div>
-                        <div><dt>GPS status</dt><dd><span class="user-detail-status {{ $user->status === 'active' ? 'is-active' : 'is-inactive' }}"><i></i>{{ $user->status === 'active' ? 'ON' : 'OFF' }}</span></dd></div>
-                        <div><dt>Battery</dt><dd>78%</dd></div>
-                        <div><dt>Last update</dt><dd>{{ now()->format('d M Y, h:i A') }}</dd></div>
+                        <div><dt>Network</dt><dd>Unknown</dd></div>
+                        <div><dt>GPS status</dt><dd>Unknown</dd></div>
+                        <div><dt>Battery</dt><dd>Unknown</dd></div>
+                        <div><dt>Last update</dt><dd>Unknown</dd></div>
                     @else
                         <div class="user-detail-device-empty-row">
                             <dt>Device status</dt><dd>No device connected</dd>
@@ -76,11 +76,11 @@
                                 <strong>{{ $user->name }}</strong>
                                 <span>{{ $user->user_code }}</span>
                             </div>
-                            <div class="user-detail-phone-location"><span><i></i> Current location</span><strong>India Gate, New Delhi</strong><small>28.6129° N, 77.2295° E</small></div>
+                            <div class="user-detail-phone-location"><span><i></i> Current location</span><strong>Unknown</strong><small>Location not available</small></div>
                             <div class="user-detail-phone-device">
                                 <span class="user-detail-phone-device-icon"><x-icon name="device" /></span>
-                                <span><small>{{ $device->manufacturer }}</small><strong>{{ $device->device_model }}</strong></span>
-                                <span class="user-detail-phone-online"><i></i>{{ $user->status === 'active' ? 'Online' : 'Offline' }}</span>
+                                <span><small>{{ $device->manufacturer ?: 'Unknown' }}</small><strong>{{ $device->device_model ?: 'Unknown' }}</strong></span>
+                                <span class="user-detail-phone-online"><i></i>Unknown</span>
                             </div>
                             <span class="user-detail-phone-home"></span>
                         </div>

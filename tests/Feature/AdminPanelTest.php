@@ -112,7 +112,7 @@ class AdminPanelTest extends TestCase
         $this->assertSame('1.2.3', $device->firmware_version);
     }
 
-    public function test_admin_can_create_and_store_user_records_only(): void
+    public function test_admin_can_create_user_with_unassigned_device(): void
     {
         $admin = Admin::factory()->create();
         $this->actingAs($admin, 'admin');
@@ -125,9 +125,14 @@ class AdminPanelTest extends TestCase
             'password' => 'StrongPassword!123',
         ]);
 
-        $response->assertRedirect(route('admin.user-management.users'));
+        $response->assertRedirect(route('admin.user-management.devices'));
         $this->assertDatabaseHas('users', ['email' => 'test.user@example.com']);
         $user = User::firstOrFail();
+        $device = $user->devices()->firstOrFail();
+        $this->assertSame('Unknown', $device->manufacturer);
+        $this->assertSame('Unknown', $device->device_model);
+        $this->assertStringStartsWith('Pending-', $device->device_uuid);
+        $this->assertNull($device->firmware_version);
         $this->assertMatchesRegularExpression('/^[A-Z0-9]{10}$/', $user->user_code);
         $this->assertNotSame('StrongPassword!123', $user->password);
         $this->assertTrue(Hash::check('StrongPassword!123', $user->password));
@@ -243,7 +248,7 @@ class AdminPanelTest extends TestCase
         $this->assertSame('1', $inactiveCount[1] ?? null);
     }
 
-    public function test_admin_device_page_uses_user_data_with_device_labels_and_demo_only_actions(): void
+    public function test_admin_device_page_shows_user_counts_and_actions(): void
     {
         $admin = Admin::factory()->create();
         $user = User::factory()->create([
@@ -258,10 +263,11 @@ class AdminPanelTest extends TestCase
             ->get(route('admin.user-management.devices'))
             ->assertOk()
             ->assertSee('Device Management')
-            ->assertSee('Total devices')
-            ->assertSee('Active devices')
+            ->assertSee('Total users')
+            ->assertSee('Active users')
+            ->assertSee('Inactive users')
             ->assertDontSee('Add device')
-            ->assertDontSee('data-open-user-modal', false)
+            ->assertSee('data-open-user-modal', false)
             ->assertSee('Search devices...')
             ->assertSee('Demo Device Owner')
             ->assertSee('class="registered-user-card device-card"', false)
@@ -269,30 +275,30 @@ class AdminPanelTest extends TestCase
             ->assertSee('class="device-phone"', false)
             ->assertSee('class="device-card-content"', false)
             ->assertSee('class="registered-user-status is-active"', false)
-            ->assertSee('Connected')
+            ->assertSee('Unknown')
             ->assertSee('class="device-specs"', false)
-            ->assertSee('Eemo Tracker')
-            ->assertSee('GT06')
-            ->assertSee('Airtel 4G')
+            ->assertSee('Manufacturer')
+            ->assertSee('Unknown')
             ->assertSee('GPS Status')
-            ->assertSee('78%')
+            ->assertSee('Battery')
             ->assertSee('Last Update')
             ->assertDontSee('device.owner@example.com</span>', false)
             ->assertDontSee('9876543210</span>', false)
             ->assertDontSee('123 Demo Device Street</span>', false)
-            ->assertSee('data-entity="device"', false)
+            ->assertSee('data-entity="user"', false)
+            ->assertSee('class="action-button edit-button"', false)
+            ->assertSee('data-user-id="'.$user->id.'"', false)
+            ->assertSee('>Edit</button>', false)
             ->assertSee('>Track</a>', false)
             ->assertSee('>Report</a>', false)
             ->assertSee(route('admin.tracking.live-location'), false)
-            ->assertSee(route('admin.user-management.reports'), false)
-            ->assertDontSee('edit-button', false)
+            ->assertSee(route('admin.user-management.users.show', $user), false)
             ->assertDontSee('view-button', false)
-            ->assertSee('data-demo-only="true"', false)
-            ->assertSee('Demo only — device changes are not saved.')
+            ->assertSee('data-create-action="'.route('admin.user-management.users.store').'"', false)
+            ->assertSee('data-update-action-template="'.route('admin.user-management.users.update', ['user' => '__USER__']).'"', false)
             ->assertSee(route('admin.user-management.devices'), false);
 
-        $response->assertDontSee('Total users')->assertDontSee('Add user');
-        $response->assertSee('action="#"', false);
+        $response->assertSee('Total users')->assertSee('Add user');
 
         $this->post(route('admin.user-management.devices'), [
             'name' => 'Should Not Be Saved',
@@ -301,6 +307,19 @@ class AdminPanelTest extends TestCase
             'password' => 'StrongPassword!123',
         ])->assertMethodNotAllowed();
         $this->assertDatabaseCount('users', 1);
+
+        $this->post(route('admin.user-management.users.store'), [
+            'name' => 'Created From Device Page',
+            'email' => 'created.from.devices@example.com',
+            'phone' => '9876543211',
+            'password' => 'StrongPassword!123',
+        ])->assertRedirect(route('admin.user-management.devices'));
+        $this->assertDatabaseHas('users', ['email' => 'created.from.devices@example.com']);
+        $this->assertDatabaseHas('devices', [
+            'user_id' => User::where('email', 'created.from.devices@example.com')->value('id'),
+            'manufacturer' => 'Unknown',
+            'device_model' => 'Unknown',
+        ]);
 
         $this->get(route('admin.user-management.users'))
             ->assertOk()
@@ -485,11 +504,11 @@ class AdminPanelTest extends TestCase
         $this->assertStringContainsString('https://api.open-meteo.com', $response->headers->get('Content-Security-Policy'));
         $this->assertSame('camera=(), microphone=(), geolocation=(self)', $response->headers->get('Permissions-Policy'));
         foreach (['profile', 'developer/activity-logs', 'security/active-sessions', 'developer/error-log', 'developer/mobile-app', 'developer/settings', 'security/developer-mode', 'notifications', 'user-management/users', 'user-management/devices', 'user-management/reports', 'tracking/live-location', 'tracking/geo-fence', 'tracking/task', 'tracking/sos', 'groups', 'licence', 'licence/subscription', 'licence/payments', 'support'] as $path) {
-            $this->get('/admin/'.$path)->assertOk()->assertSee('Eemo')->assertSee('Notification</span>', false)->assertSee('<span>SOS &amp; Alert</span>', false)->assertSee('User & Account')->assertSee('User')->assertSee('Device')->assertDontSee('<span>Reports</span>', false)->assertSee('Tracking')->assertSee('Live &amp; History', false)->assertSee('<span>Geofence</span>', false)->assertDontSee('Geofence &amp; SOS', false)->assertDontSee('<span>SOS</span>', false)->assertDontSee('<span>Alert</span>', false)->assertSee('Task')->assertSee('Group')->assertSee('Licence')->assertSee('Subscription')->assertSee('Payments')->assertSee('Support')->assertSee('Admin Profile')->assertDontSee('<span>My Profile</span>', false)->assertSee('Activity Log')->assertSee('Active Sessions')->assertSee('Error Log')->assertSee('<span>Developer</span>', false)->assertDontSee('<span>Developer Mode</span>', false);
+            $this->get('/admin/'.$path)->assertOk()->assertSee('Eemo')->assertSee('Notification</span>', false)->assertSee('<span>SOS &amp; Alert</span>', false)->assertDontSee('user-management-submenu', false)->assertDontSee('<span>User</span>', false)->assertSee('Device')->assertDontSee('<span>Reports</span>', false)->assertSee('Tracking')->assertSee('Live &amp; History', false)->assertSee('<span>Geofence</span>', false)->assertDontSee('Geofence &amp; SOS', false)->assertDontSee('<span>SOS</span>', false)->assertDontSee('<span>Alert</span>', false)->assertSee('Task')->assertSee('Group')->assertSee('Licence')->assertSee('Subscription')->assertSee('Payments')->assertSee('Support')->assertSee('Admin Profile')->assertDontSee('<span>My Profile</span>', false)->assertSee('Activity Log')->assertSee('Active Sessions')->assertSee('Error Log')->assertSee('<span>Developer</span>', false)->assertDontSee('<span>Developer Mode</span>', false);
         }
         $this->get('/admin/notifications')->assertSee('Notification</span>', false)->assertDontSee('<h1', false);
-        $this->get('/admin/user-management/users')->assertSee('User</span>', false)->assertDontSee('<h1', false);
-        $this->get('/admin/user-management/devices')->assertSee('Device</span>', false)->assertDontSee('<h1', false);
+        $this->get('/admin/user-management/users')->assertDontSee('<span>User</span>', false)->assertSee('<span>User &amp; Device</span>', false)->assertDontSee('<h1', false);
+        $this->get('/admin/user-management/devices')->assertSee('User &amp; Device</span>', false)->assertDontSee('<h1', false);
         $this->get('/admin/user-management/reports')->assertSee('Reports</span>', false)->assertDontSee('<h1', false);
         $this->get('/admin/tracking/live-location')
             ->assertSee('Live Location</span>', false)

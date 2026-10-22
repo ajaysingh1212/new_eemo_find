@@ -7,21 +7,24 @@
         $totalUserCount = $totalUsers ?? $users->total();
         $recordLabel = $isDevicePage ? 'device' : 'user';
         $recordPlural = $isDevicePage ? 'devices' : 'users';
+        $statsPlural = $isDevicePage ? 'users' : $recordPlural;
+        $emptyLabel = $isDevicePage ? 'user' : $recordLabel;
+        $emptyPlural = $isDevicePage ? 'users' : $recordPlural;
     @endphp
 
     <section @class(['user-management', 'device-management' => $isDevicePage])>
         <div class="user-panel-header">
             <div class="user-stats">
                 <article class="user-stat total-stat">
-                    <span>Total {{ $recordPlural }}</span>
+                    <span>Total {{ $statsPlural }}</span>
                     <strong>{{ $totalUserCount }}</strong>
                 </article>
                 <article class="user-stat active-stat">
-                    <span>Active {{ $recordPlural }}</span>
+                    <span>Active {{ $statsPlural }}</span>
                     <strong>{{ $activeUsers }}</strong>
                 </article>
                 <article class="user-stat inactive-stat">
-                    <span>Inactive {{ $recordPlural }}</span>
+                    <span>Inactive {{ $statsPlural }}</span>
                     <strong>{{ $inactiveUsers }}</strong>
                 </article>
             </div>
@@ -32,16 +35,15 @@
                     <input type="search" name="q" value="{{ $search }}" placeholder="Search {{ $recordPlural }}..." aria-label="Search {{ $recordPlural }}">
                     <button type="submit" class="search-button">Search</button>
                 </form>
-                @unless ($isDevicePage)
-                    <button type="button" class="primary-button" data-open-user-modal>
-                        <x-icon name="user" /> Add user
-                    </button>
-                @endunless
+                <button type="button" class="primary-button" data-open-user-modal>
+                    <x-icon name="user" /> Add user
+                </button>
             </div>
         </div>
 
         <div class="user-card-grid">
             @forelse ($users as $user)
+                @php($device = $isDevicePage ? $user->devices->first() : null)
                 <article @class(['registered-user-card', 'device-card' => $isDevicePage])>
                     <div @class(['registered-user-top', 'device-owner-header' => $isDevicePage])>
                         <div class="registered-user-identity">
@@ -67,8 +69,8 @@
                                 <strong class="device-phone-appname">Eemo-Find</strong>
                                 <span class="device-phone-caption">DEVICE TRACKING</span>
                                 <span class="device-phone-map"><i></i><b></b></span>
-                                <span class="device-phone-connection {{ $user->status === 'active' ? 'is-connected' : 'is-disconnected' }}">
-                                    <i></i>{{ $user->status === 'active' ? 'Connected' : 'Offline' }}
+                                <span class="device-phone-connection is-unknown">
+                                    <i></i>Unknown
                                 </span>
                                 <span class="device-phone-home"></span>
                             </div>
@@ -77,27 +79,27 @@
                         <div class="device-specs">
                             <div class="device-spec">
                                 <span class="device-spec-icon device-tone-green"><x-icon name="device" /></span>
-                                <span class="device-spec-copy"><small>Device Name</small><strong>Eemo Tracker</strong></span>
+                                <span class="device-spec-copy"><small>Manufacturer</small><strong>{{ $device?->manufacturer ?: 'Unknown' }}</strong></span>
                             </div>
                             <div class="device-spec">
                                 <span class="device-spec-icon device-tone-red"><x-icon name="cpu" /></span>
-                                <span class="device-spec-copy"><small>Model</small><strong>GT06</strong></span>
+                                <span class="device-spec-copy"><small>Model</small><strong>{{ $device?->device_model ?: 'Unknown' }}</strong></span>
                             </div>
                             <div class="device-spec">
                                 <span class="device-spec-icon device-tone-orange"><x-icon name="signal" /></span>
-                                <span class="device-spec-copy"><small>Network</small><strong>Airtel 4G <span class="device-signal-bars" aria-label="Strong signal"><i></i><i></i><i></i></span></strong></span>
+                                <span class="device-spec-copy"><small>Network</small><strong>Unknown</strong></span>
                             </div>
                             <div class="device-spec">
                                 <span class="device-spec-icon device-tone-blue"><x-icon name="map-pin" /></span>
-                                <span class="device-spec-copy"><small>GPS Status</small><strong><span class="device-gps-status {{ $user->status === 'active' ? 'is-on' : 'is-off' }}"><i></i>{{ $user->status === 'active' ? 'ON' : 'OFF' }}</span></strong></span>
+                                <span class="device-spec-copy"><small>GPS Status</small><strong>Unknown</strong></span>
                             </div>
                             <div class="device-spec">
                                 <span class="device-spec-icon device-tone-teal"><x-icon name="battery" /></span>
-                                <span class="device-spec-copy device-battery-copy"><small>Battery</small><strong>78%</strong><span class="device-battery-meter" role="meter" aria-label="Battery level" aria-valuemin="0" aria-valuemax="100" aria-valuenow="78"><i></i></span></span>
+                                <span class="device-spec-copy"><small>Battery</small><strong>Unknown</strong></span>
                             </div>
                             <div class="device-spec">
                                 <span class="device-spec-icon device-tone-purple"><x-icon name="clock" /></span>
-                                <span class="device-spec-copy"><small>Last Update</small><strong>{{ now()->format('d M Y, h:i A') }}</strong></span>
+                                <span class="device-spec-copy"><small>Last Update</small><strong>Unknown</strong></span>
                             </div>
                         </div>
                     @else
@@ -121,8 +123,16 @@
 
                     <div class="registered-user-actions">
                         @if ($isDevicePage)
+                            <button type="button" class="action-button edit-button"
+                                data-user-id="{{ $user->id }}"
+                                data-user-name="{{ $user->name }}"
+                                data-user-email="{{ $user->email }}"
+                                data-user-phone="{{ $user->phone }}"
+                                data-user-address="{{ $user->address ?? '' }}"
+                                data-user-status="{{ $user->status }}"
+                                data-user-image="{{ $user->profile_image ? Storage::disk('public')->url($user->profile_image) : '' }}">Edit</button>
                             <a class="action-button track-button" href="{{ route('admin.tracking.live-location') }}">Track</a>
-                            <a class="action-button report-button" href="{{ route('admin.user-management.reports') }}">Report</a>
+                            <a class="action-button report-button" href="{{ route('admin.user-management.users.show', $user) }}">Report</a>
                         @else
                             <button type="button" class="action-button edit-button"
                                 data-user-id="{{ $user->id }}"
@@ -142,8 +152,8 @@
             @empty
                 <div class="user-grid-empty">
                     <span class="empty-icon" aria-hidden="true">+</span>
-                    <strong>No {{ $recordPlural }} found</strong>
-                    <p>{{ $search ? 'Try another search, or add a new '.$recordLabel.'.' : 'Add your first '.$recordLabel.' to get started.' }}</p>
+                    <strong>No {{ $emptyPlural }} found</strong>
+                    <p>{{ $search ? 'Try another search, or add a new '.$emptyLabel.'.' : 'Add your first '.$emptyLabel.' to get started.' }}</p>
                 </div>
             @endforelse
         </div>
@@ -155,18 +165,18 @@
         @endif
     </section>
 
-    <div class="user-modal-backdrop" id="user-modal-backdrop" data-entity="{{ $recordLabel }}" @if ($errors->any()) data-reopen-create @else hidden @endif>
+    <div class="user-modal-backdrop" id="user-modal-backdrop" data-entity="user" @if ($errors->any()) data-reopen-create @else hidden @endif>
         <div class="user-modal" role="dialog" aria-modal="true" aria-labelledby="user-modal-title">
             <div class="user-modal-header">
                 <div>
-                    <p class="eyebrow" id="user-modal-tag">CREATE {{ strtoupper($recordLabel) }}</p>
-                    <h3 id="user-modal-title">Register a new {{ $recordLabel }}</h3>
-                    <p class="user-modal-subtitle" id="user-modal-subtitle">Add a {{ $recordLabel }} record to your registry.</p>
+                    <p class="eyebrow" id="user-modal-tag">CREATE USER</p>
+                    <h3 id="user-modal-title">Register a new user</h3>
+                    <p class="user-modal-subtitle" id="user-modal-subtitle">Add a user record to your registry.</p>
                 </div>
-                <button type="button" class="close-modal" data-close-user-modal aria-label="Close {{ $recordLabel }} modal">×</button>
+                <button type="button" class="close-modal" data-close-user-modal aria-label="Close user modal">×</button>
             </div>
 
-            <form id="user-form" method="POST" action="{{ $isDevicePage ? '#' : route('admin.user-management.users.store') }}" data-demo-only="{{ $isDevicePage ? 'true' : 'false' }}" data-create-action="{{ $isDevicePage ? '#' : route('admin.user-management.users.store') }}" data-update-action-template="{{ $isDevicePage ? '' : route('admin.user-management.users.update', ['user' => '__USER__']) }}" enctype="multipart/form-data" class="user-form">
+            <form id="user-form" method="POST" action="{{ route('admin.user-management.users.store') }}" data-create-action="{{ route('admin.user-management.users.store') }}" data-update-action-template="{{ route('admin.user-management.users.update', ['user' => '__USER__']) }}" enctype="multipart/form-data" class="user-form">
                 @csrf
                 <input type="hidden" name="_method" id="user-form-method" value="POST">
                 @if ($errors->any())
@@ -226,12 +236,9 @@
                     </label>
                 </div>
 
-                @if ($isDevicePage)
-                    <p class="user-field-hint">Demo only — device changes are not saved.</p>
-                @endif
                 <div class="modal-actions">
                     <button type="button" class="secondary-button" data-close-user-modal id="user-cancel-button">Cancel</button>
-                    <button type="submit" class="primary-button" id="user-submit-button"><span id="user-submit-label">Create {{ $recordLabel }}</span></button>
+                    <button type="submit" class="primary-button" id="user-submit-button"><span id="user-submit-label">Create user</span></button>
                 </div>
             </form>
         </div>

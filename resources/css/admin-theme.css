@@ -1801,6 +1801,10 @@ body.admin-shell {
     margin-top: auto;
 }
 
+.admin-shell .device-card-content .registered-user-actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .admin-shell .action-button {
     min-height: 37px;
     border: 1px solid transparent;

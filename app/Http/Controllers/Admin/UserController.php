@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class UserController extends Controller
@@ -41,6 +43,7 @@ class UserController extends Controller
                         ->orWhere('address', 'like', "%{$search}%");
                 });
             })
+            ->when($isDevicePage, fn ($query) => $query->with('devices'))
             ->latest()
             ->paginate(12)
             ->appends(['q' => $search]);
@@ -77,17 +80,26 @@ class UserController extends Controller
             $profileImage = $request->file('profile_image')->store('user-profiles', 'public');
         }
 
-        User::create([
-            'name' => $validated['name'],
-            'email' => strtolower(trim($validated['email'])),
-            'phone' => preg_replace('/\s+/', '', $validated['phone']),
-            'address' => $validated['address'] ?? null,
-            'password' => $validated['password'],
-            'profile_image' => $profileImage,
-            'status' => 'active',
-        ]);
+        DB::transaction(function () use ($validated, $profileImage): void {
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => strtolower(trim($validated['email'])),
+                'phone' => preg_replace('/\s+/', '', $validated['phone']),
+                'address' => $validated['address'] ?? null,
+                'password' => $validated['password'],
+                'profile_image' => $profileImage,
+                'status' => 'active',
+            ]);
 
-        return redirect()->route('admin.user-management.users')->with('status', 'User registered successfully.');
+            $user->devices()->create([
+                'manufacturer' => 'Unknown',
+                'device_model' => 'Unknown',
+                'device_uuid' => 'Pending-'.Str::uuid(),
+                'firmware_version' => null,
+            ]);
+        });
+
+        return redirect()->route('admin.user-management.devices')->with('status', 'User and device registered successfully.');
     }
 
     public function update(Request $request, User $user)
