@@ -20,6 +20,7 @@ class ActivityLogger
         'password.reset' => 'Reset password and revoked active sessions',
         'session.revoked' => 'Revoked an admin session',
         'security.updated' => 'Updated security settings',
+        'activity_logs.cleared' => 'Cleared activity logs',
     ];
 
     public function log(string $action, ?Admin $admin = null, array $metadata = []): AdminActivityLog
@@ -34,6 +35,9 @@ class ActivityLogger
         }
         if (isset($metadata['current_session'])) {
             $safe['current_session'] = (bool) $metadata['current_session'];
+        }
+        if (isset($metadata['deleted_count'])) {
+            $safe['deleted_count'] = max(0, (int) $metadata['deleted_count']);
         }
 
         return AdminActivityLog::create([

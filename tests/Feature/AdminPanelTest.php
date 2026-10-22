@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Admin;
 use App\Models\AdminActivityLog;
 use App\Models\Device;
+use App\Models\SupportTicket;
 use App\Models\User;
 use App\Services\ActivityLogger;
 use App\Services\BrandingService;
@@ -362,11 +363,122 @@ class AdminPanelTest extends TestCase
 
     public function test_all_mutations_require_authentication(): void
     {
-        foreach (['patch' => ['profile'], 'put' => ['profile/photo', 'profile/logo', 'profile/password'], 'delete' => ['profile/photo', 'profile/logo', 'security/active-sessions'], 'post' => ['logout']] as $method => $paths) {
+        foreach (['patch' => ['profile', 'support/tickets/1'], 'put' => ['profile/photo', 'profile/logo', 'profile/password'], 'delete' => ['profile/photo', 'profile/logo', 'security/active-sessions'], 'post' => ['logout', 'support/tickets']] as $method => $paths) {
             foreach ($paths as $path) {
                 $this->$method('/admin/'.$path)->assertRedirect(route('admin.login'));
             }
         }
+    }
+
+    public function test_support_tickets_can_be_created_updated_and_counted_by_status(): void
+    {
+        $admin = Admin::factory()->create();
+        $linkedUser = User::factory()->create(['name' => 'Ticket User']);
+        $this->actingAs($admin, 'admin');
+
+        $this->get(route('admin.support'))
+            ->assertOk()
+            ->assertSee('class="user-panel-header support-panel-header"', false)
+            ->assertSee('class="user-stats support-stats"', false)
+            ->assertSee('Total tickets')
+            ->assertSee('Pending')
+            ->assertSee('Resolved')
+            ->assertSee('placeholder="Search tickets..."', false)
+            ->assertSee('Create ticket')
+            ->assertSee('Create support ticket')
+            ->assertSee('data-open-support-create', false)
+            ->assertSee('name="q"', false)
+            ->assertSee('name="name"', false)
+            ->assertSee('name="number"', false)
+            ->assertSee('name="issue"', false)
+            ->assertSee('name="created_by_user_id"', false)
+            ->assertSee('Ticket User');
+
+        $this->post(route('admin.support.store'), [
+            'name' => 'Customer One',
+            'number' => '+91 9876543210',
+            'issue' => 'Tracker is not updating location.',
+            'created_by_user_id' => $linkedUser->id,
+        ])->assertRedirect(route('admin.support'));
+
+        $ticket = SupportTicket::firstOrFail();
+        $this->assertSame('pending', $ticket->status);
+        $this->assertSame($linkedUser->id, $ticket->created_by_user_id);
+        $this->get(route('admin.support'))
+            ->assertSee('1</strong>', false)
+            ->assertSee('Customer One')
+            ->assertSee('Created by: Ticket User')
+            ->assertSee('+91 9876543210')
+            ->assertSee('Tracker is not updating location.')
+            ->assertSee('data-open-support-ticket="support-ticket-'.$ticket->id.'"', false)
+            ->assertSee('Resolve');
+
+        $this->get(route('admin.support', ['q' => 'Customer One']))
+            ->assertOk()
+            ->assertSee('Customer One');
+        $this->get(route('admin.support', ['q' => 'Ticket User']))
+            ->assertOk()
+            ->assertSee('Customer One');
+        $this->get(route('admin.support', ['q' => 'no matching result']))
+            ->assertOk()
+            ->assertSee('No matching tickets')
+            ->assertDontSee('Customer One');
+
+        $this->patch(route('admin.support.update', $ticket), [
+            'status' => 'resolved',
+            'remark' => 'Device settings refreshed; customer confirmed.',
+        ])->assertRedirect(route('admin.support'));
+        $this->assertDatabaseHas('support_tickets', [
+            'id' => $ticket->id,
+            'status' => 'resolved',
+            'remark' => 'Device settings refreshed; customer confirmed.',
+        ]);
+
+        $this->get(route('admin.support'))
+            ->assertSee('Resolved')
+            ->assertSee('Device settings refreshed; customer confirmed.');
+
+        $this->patch(route('admin.support.update', $ticket), [
+            'status' => 'rejected',
+            'remark' => 'Insufficient information.',
+        ])->assertRedirect(route('admin.support'));
+        $this->assertDatabaseHas('support_tickets', [
+            'id' => $ticket->id,
+            'status' => 'rejected',
+            'remark' => 'Insufficient information.',
+        ]);
+
+        $this->patch(route('admin.support.update', $ticket), [
+            'status' => 'deleted',
+            'remark' => '',
+        ])->assertRedirect(route('admin.support', ['ticket' => $ticket->id]))
+            ->assertSessionHasErrors('status');
+        $this->get(route('admin.support', ['ticket' => $ticket->id]))
+            ->assertSee('support-ticket-'.$ticket->id.'" aria-labelledby', false)
+            ->assertSee('is-reopen', false)
+            ->assertSee('The selected status is invalid.');
+
+        $this->post(route('admin.support.store'), [
+            'name' => '',
+            'number' => '',
+            'issue' => '',
+        ])->assertSessionHasErrors(['name', 'number', 'issue']);
+        $this->post(route('admin.support.store'), [
+            'name' => 'Unlinked Customer',
+            'number' => '123456789',
+            'issue' => 'No linked user selected.',
+        ])->assertRedirect(route('admin.support'));
+        $this->assertDatabaseHas('support_tickets', [
+            'name' => 'Unlinked Customer',
+            'created_by_user_id' => null,
+        ]);
+        $this->post(route('admin.support.store'), [
+            'name' => 'Invalid User Customer',
+            'number' => '123456788',
+            'issue' => 'User ID should be valid.',
+            'created_by_user_id' => 999999,
+        ])->assertSessionHasErrors('created_by_user_id');
+        $this->assertDatabaseCount('support_tickets', 2);
     }
 
     public function test_login_success_regenerates_session_and_logs_event(): void
@@ -531,11 +643,12 @@ class AdminPanelTest extends TestCase
         $this->get('/admin/licence')->assertSee('Licence</span>', false)->assertDontSee('<h1', false);
         $this->get('/admin/licence/subscription')->assertSee('Subscription</span>', false)->assertDontSee('<h1', false);
         $this->get('/admin/licence/payments')->assertSee('Payments</span>', false)->assertDontSee('<h1', false);
-        $this->get('/admin/support')->assertSee('Support</span>', false)->assertDontSee('<h1', false);
+        $this->get('/admin/support')->assertSee('Support</span>', false)->assertSee('class="user-panel-header support-panel-header"', false)->assertSee('Total tickets');
         $activityLogs = $this->get('/admin/developer/activity-logs')
             ->assertSee('Activity Log</span>', false)
             ->assertSee('>Developer</span>', false)
-            ->assertSee('<h1>Activity Log', false);
+            ->assertSee('Account events')
+            ->assertDontSee('<h1>Activity Log', false);
         $developerMode = $this->get('/admin/security/developer-mode')
             ->assertSee('Developer</span>', false)
             ->assertDontSee('<h1', false);
@@ -723,6 +836,42 @@ class AdminPanelTest extends TestCase
         $this->patch('/admin/developer/activity-logs/'.$log->id)->assertStatus(405);
     }
 
+    public function test_only_super_admin_can_clear_activity_logs_and_clear_is_audited(): void
+    {
+        $superAdmin = Admin::factory()->create(['is_super_admin' => true]);
+        $otherAdmin = Admin::factory()->create();
+        app(ActivityLogger::class)->log('login.success', $superAdmin);
+        app(ActivityLogger::class)->log('profile.updated', $otherAdmin);
+
+        $this->actingAs($superAdmin, 'admin')
+            ->get(route('admin.developer.activity-logs.index'))
+            ->assertOk()
+            ->assertSee('Clear all');
+
+        $this->actingAs($otherAdmin, 'admin')
+            ->withSession(['password_hash_admin' => $otherAdmin->getAuthPassword()])
+            ->get(route('admin.developer.activity-logs.index'))
+            ->assertOk()
+            ->assertDontSee('Clear all');
+        $this->delete(route('admin.developer.activity-logs.destroy'))->assertForbidden();
+        $this->assertDatabaseCount('admin_activity_logs', 2);
+
+        $this->actingAs($superAdmin, 'admin')
+            ->withSession(['password_hash_admin' => $superAdmin->getAuthPassword()])
+            ->delete(route('admin.developer.activity-logs.destroy'))
+            ->assertRedirect(route('admin.developer.activity-logs.index'))
+            ->assertSessionHas('status', 'Activity logs cleared. The clear action was recorded in the audit log.');
+
+        $this->assertDatabaseCount('admin_activity_logs', 1);
+        $this->assertDatabaseHas('admin_activity_logs', [
+            'admin_id' => $superAdmin->id,
+            'action' => 'activity_logs.cleared',
+            'metadata' => json_encode(['deleted_count' => 2]),
+        ]);
+        $this->assertDatabaseMissing('admin_activity_logs', ['action' => 'login.success']);
+        $this->assertDatabaseMissing('admin_activity_logs', ['action' => 'profile.updated']);
+    }
+
     public function test_regular_admin_cannot_read_other_admin_audit_records_or_bypass_search_scope(): void
     {
         $admin = Admin::factory()->create();
@@ -740,8 +889,54 @@ class AdminPanelTest extends TestCase
             app(ActivityLogger::class)->log('login.success', $admin);
         }
         $this->actingAs($admin, 'admin')->get('/admin/developer/activity-logs?search=login&admin_id='.$admin->id.'&from='.now()->format('Y-m-d').'&to='.now()->format('Y-m-d'))
-            ->assertOk()->assertSee('18 events')->assertSee('Page 1 of 2')->assertSee('&lt;script&gt;', false)->assertDontSee('<script>alert(1)</script>', false);
+            ->assertOk()->assertDontSee('DEVELOPER / ACCOUNT HISTORY')->assertDontSee('Read-only audit trail')->assertSee('Account events')->assertSee('18 events')->assertSee('Page 1 of 2')->assertSee('&lt;script&gt;', false)->assertDontSee('<script>alert(1)</script>', false);
         $this->get('/admin/developer/activity-logs?from=invalid')->assertSessionHasErrors('from');
+    }
+
+    public function test_super_admin_can_view_bounded_redacted_laravel_error_log(): void
+    {
+        $path = storage_path('framework/testing/laravel-error-log-'.uniqid('', true).'.log');
+        file_put_contents($path, "[2026-10-22 12:00:00] local.ERROR: Failed request password=secret-password token: secret-token Authorization: Bearer abc.def-123\n");
+
+        try {
+            config([
+                'logging.default' => 'single',
+                'logging.channels.single.path' => $path,
+            ]);
+
+            $admin = Admin::factory()->create(['is_super_admin' => true]);
+            $this->actingAs($admin, 'admin')
+                ->get('/admin/developer/error-log')
+                ->assertOk()
+                ->assertSee('Laravel application log')
+                ->assertSee('Failed request')
+                ->assertSee('[REDACTED]')
+                ->assertDontSee('secret-password')
+                ->assertDontSee('secret-token')
+                ->assertDontSee('abc.def-123')
+                ->assertSee(route('admin.developer.error-log.destroy'), false)
+                ->assertSee('Clear log');
+
+            $this->delete(route('admin.developer.error-log.destroy'))
+                ->assertRedirect()
+                ->assertSessionHas('status', 'Laravel error log cleared.');
+            $this->assertSame('', file_get_contents($path));
+            $this->get('/admin/developer/error-log')
+                ->assertOk()
+                ->assertSee('The Laravel log file is empty.');
+
+            $regularAdmin = Admin::factory()->create();
+            $this->actingAs($regularAdmin, 'admin')
+                ->withSession(['password_hash_admin' => $regularAdmin->getAuthPassword()])
+                ->get('/admin/developer/error-log')
+                ->assertForbidden();
+            $this->delete(route('admin.developer.error-log.destroy'))
+                ->assertForbidden();
+        } finally {
+            if (is_file($path)) {
+                unlink($path);
+            }
+        }
     }
 
     public function test_date_filters_allow_either_bound_independently_and_reject_reversed_range(): void

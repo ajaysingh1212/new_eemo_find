@@ -422,3 +422,24 @@ if (trafficMap) {
 
     if (backdrop.hasAttribute('data-reopen-create')) openModal('create');
 })();
+
+(() => {
+    const createDialog = document.getElementById('support-create-dialog');
+    const openDialog = dialog => {
+        if (dialog?.showModal && !dialog.open) dialog.showModal();
+    };
+
+    document.querySelector('[data-open-support-create]')?.addEventListener('click', () => openDialog(createDialog));
+    document.querySelectorAll('[data-open-support-ticket]').forEach(button => {
+        button.addEventListener('click', () => openDialog(document.getElementById(button.dataset.openSupportTicket)));
+    });
+    document.querySelectorAll('.support-dialog.is-reopen').forEach(openDialog);
+    document.querySelectorAll('[data-close-support-dialog]').forEach(button => {
+        button.addEventListener('click', () => button.closest('dialog')?.close());
+    });
+    document.querySelectorAll('.support-dialog').forEach(dialog => {
+        dialog.addEventListener('click', event => {
+            if (event.target === dialog) dialog.close();
+        });
+    });
+})();

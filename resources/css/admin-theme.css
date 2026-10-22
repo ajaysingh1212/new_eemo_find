@@ -1509,6 +1509,11 @@ body.admin-shell {
     color: var(--user-foreground);
 }
 
+.admin-shell .user-management.device-management {
+    width: 100%;
+    min-width: 0;
+}
+
 .admin-shell .user-panel-header,
 .admin-shell .user-modal-header,
 .admin-shell .modal-actions,
@@ -1802,7 +1807,189 @@ body.admin-shell {
 }
 
 .admin-shell .device-card-content .registered-user-actions {
+    width: 100%;
     grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.admin-shell .error-log-output {
+    max-height: 70vh;
+    overflow: auto;
+    margin: 0;
+    padding: 16px;
+    border: 1px solid rgba(148, 163, 184, .2);
+    border-radius: 12px;
+    background: #111827;
+    color: #e5e7eb;
+    font: .78rem/1.6 ui-monospace, SFMono-Regular, Consolas, monospace;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+}
+
+.admin-shell .support-stats {
+    gap: 0;
+}
+
+.admin-shell .support-stats .user-stat + .user-stat {
+    flex: 1 1 0;
+}
+
+.admin-shell .support-ticket-listing {
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-shell .support-ticket-row {
+    display: grid;
+    grid-template-columns: minmax(170px, .8fr) minmax(180px, 1.5fr) 100px auto;
+    align-items: center;
+    gap: 18px;
+    padding: 16px 8px;
+    border-bottom: 1px solid #e4edf9;
+}
+
+.admin-shell .support-ticket-row:last-child {
+    border-bottom: 0;
+}
+
+.admin-shell .support-ticket-primary {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.admin-shell .support-ticket-id {
+    display: grid;
+    width: 38px;
+    height: 38px;
+    flex: none;
+    place-items: center;
+    border-radius: 11px;
+    color: #286bd0;
+    background: #eaf2ff;
+    font-size: .78rem;
+    font-weight: 750;
+}
+
+.admin-shell .support-ticket-customer {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+}
+
+.admin-shell .support-ticket-customer strong {
+    overflow: hidden;
+    color: #17304f;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admin-shell .support-ticket-customer span,
+.admin-shell .support-ticket-summary {
+    overflow: hidden;
+    color: #7185a0;
+    font-size: .78rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admin-shell .support-ticket-summary {
+    margin: 0;
+}
+
+.admin-shell .support-ticket-open {
+    white-space: nowrap;
+}
+
+.admin-shell dialog.support-dialog {
+    width: min(560px, calc(100vw - 32px));
+    max-width: none;
+    max-height: min(90vh, 760px);
+    overflow: auto;
+    padding: 24px;
+    border: 1px solid rgba(143, 160, 197, .35);
+    border-radius: 18px;
+    color: #17304f;
+    background: #fff;
+    box-shadow: 0 24px 80px rgba(17, 41, 77, .24);
+}
+
+.admin-shell dialog.support-dialog::backdrop {
+    background: rgba(17, 31, 52, .46);
+    backdrop-filter: blur(3px);
+}
+
+.admin-shell .support-dialog-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.admin-shell .support-dialog-header h2 {
+    margin: 5px 0 0;
+}
+
+.admin-shell .support-dialog-description {
+    margin: 10px 0 0;
+    color: #7185a0;
+}
+
+.admin-shell .support-dialog-details {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin: 20px 0;
+    padding: 16px;
+    border-radius: 12px;
+    background: #f4f7fc;
+}
+
+.admin-shell .support-dialog-details > div {
+    display: grid;
+    gap: 5px;
+    min-width: 0;
+}
+
+.admin-shell .support-dialog-details span {
+    color: #7185a0;
+    font-size: .74rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.admin-shell .support-dialog-details strong,
+.admin-shell .support-dialog-issue p {
+    margin: 0;
+    color: #17304f;
+    overflow-wrap: anywhere;
+}
+
+.admin-shell .support-dialog-issue,
+.admin-shell .support-dialog-created {
+    grid-column: 1 / -1;
+}
+
+.admin-shell .support-update-form,
+.admin-shell .support-create-form {
+    display: grid;
+    gap: 14px;
+}
+
+.admin-shell .support-create-form .support-issue-field {
+    grid-column: 1 / -1;
+}
+
+.admin-shell .support-update-form .field,
+.admin-shell .support-create-form .field {
+    margin: 0;
+}
+
+.admin-shell .support-dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 4px;
 }
 
 .admin-shell .action-button {
@@ -2840,7 +3027,100 @@ body.admin-shell {
     margin-top: 20px;
 }
 
+@media (max-width: 840px) {
+    .admin-shell .support-panel-header .support-stats {
+        width: 100%;
+        flex: none;
+        gap: 0;
+    }
+
+    .admin-shell .support-panel-header .support-stats .user-stat {
+        min-width: 0;
+        flex: 1 1 0;
+    }
+}
+
 @media (max-width: 560px) {
+    .admin-shell .support-panel-header {
+        min-width: 0;
+        padding: 16px 14px;
+    }
+
+    .admin-shell .support-panel-header .support-stats {
+        justify-content: stretch;
+        gap: 0;
+    }
+
+    .admin-shell .support-panel-header .support-stats .user-stat + .user-stat {
+        padding-left: clamp(6px, 2.5vw, 10px);
+    }
+
+    .admin-shell .support-panel-header .support-stats .user-stat span {
+        overflow-wrap: anywhere;
+        font-size: clamp(.52rem, 2.5vw, .62rem);
+    }
+
+    .admin-shell .support-panel-header .user-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .admin-shell .support-panel-header .user-search-form,
+    .admin-shell .support-panel-header .user-controls > .primary-button {
+        width: 100%;
+        min-width: 0;
+        flex: none;
+    }
+
+    .admin-shell .support-panel-header .user-controls > .primary-button {
+        justify-content: center;
+    }
+
+    .admin-shell .support-ticket-row {
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-areas:
+            "primary status"
+            "summary summary"
+            "action action";
+        gap: 10px;
+    }
+
+    .admin-shell .support-ticket-primary {
+        grid-area: primary;
+    }
+
+    .admin-shell .support-ticket-summary {
+        grid-area: summary;
+        display: -webkit-box;
+        overflow: hidden;
+        white-space: normal;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+    }
+
+    .admin-shell .support-ticket-row > .event-badge {
+        grid-area: status;
+        justify-self: end;
+    }
+
+    .admin-shell .support-ticket-open {
+        grid-area: action;
+        justify-self: start;
+    }
+
+    .admin-shell dialog.support-dialog {
+        padding: 18px;
+    }
+
+    .admin-shell .support-dialog-details {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-shell .support-dialog-issue,
+    .admin-shell .support-dialog-created {
+        grid-column: auto;
+    }
+
     .admin-shell .user-modal-backdrop {
         align-items: end;
         padding: 10px;
@@ -3057,6 +3337,8 @@ body.admin-shell {
     grid-template-columns: 92px minmax(0, 1fr);
     align-items: center;
     gap: 18px;
+    width: 100%;
+    min-width: 0;
     min-height: 258px;
     padding: 18px;
 }
@@ -3064,6 +3346,7 @@ body.admin-shell {
 .admin-shell .device-owner-header {
     grid-column: 1 / -1;
     width: 100%;
+    min-width: 0;
     justify-content: space-between;
 }
 
@@ -3227,6 +3510,7 @@ body.admin-shell {
 .admin-shell .device-card-content {
     display: flex;
     min-width: 0;
+    width: 100%;
     height: 100%;
     flex-direction: column;
     justify-content: center;
@@ -3236,6 +3520,7 @@ body.admin-shell {
 .admin-shell .device-specs {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
     min-width: 0;
     padding: 3px 0;
     border-radius: 12px;
@@ -3386,6 +3671,41 @@ body.admin-shell {
 }
 
 @media (max-width: 560px) {
+    .admin-shell .support-create-form,
+    .admin-shell .support-update-form {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-shell .user-management.device-management .user-panel-header {
+        padding: 16px 14px;
+    }
+
+    .admin-shell .user-management.device-management .user-stats {
+        justify-content: stretch;
+        gap: 0;
+    }
+
+    .admin-shell .user-management.device-management .user-stat {
+        flex: 1 1 0;
+    }
+
+    .admin-shell .user-management.device-management .user-stat span {
+        font-size: clamp(.5rem, 2.5vw, .62rem);
+        overflow-wrap: anywhere;
+    }
+
+    .admin-shell .user-management.device-management .user-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .admin-shell .user-management.device-management .user-search-form,
+    .admin-shell .user-management.device-management .user-controls > .primary-button {
+        width: 100%;
+        min-width: 0;
+        flex: none;
+    }
+
     .admin-shell .device-card {
         grid-template-columns: 72px minmax(0, 1fr);
         gap: 12px;
@@ -3429,6 +3749,21 @@ body.admin-shell {
 
     .admin-shell .device-spec-copy strong {
         font-size: .68rem;
+    }
+}
+
+@media (max-width: 420px) {
+    .admin-shell .device-card {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .admin-shell .device-specs,
+    .admin-shell .device-card-content .registered-user-actions {
+        min-width: 0;
+    }
+
+    .admin-shell .device-phone {
+        justify-self: center;
     }
 }
 

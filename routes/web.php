@@ -3,9 +3,11 @@
 use App\Http\Controllers\Admin\ActivityLogController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\ErrorLogController;
 use App\Http\Controllers\Admin\PasswordResetController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\SessionController;
+use App\Http\Controllers\Admin\SupportController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -38,7 +40,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::view('licence', 'admin.blank', ['title' => 'Licence'])->name('licence');
         Route::view('licence/subscription', 'admin.blank', ['title' => 'Subscription'])->name('licence.subscription');
         Route::view('licence/payments', 'admin.blank', ['title' => 'Payments'])->name('licence.payments');
-        Route::view('support', 'admin.blank', ['title' => 'Support'])->name('support');
+        Route::get('support', [SupportController::class, 'index'])->name('support');
+        Route::post('support/tickets', [SupportController::class, 'store'])->name('support.store');
+        Route::patch('support/tickets/{supportTicket}', [SupportController::class, 'update'])->name('support.update');
         Route::get('profile', [ProfileController::class, 'index'])->name('profile');
         Route::patch('profile', [ProfileController::class, 'update'])->name('profile.update');
         Route::put('profile/photo', [ProfileController::class, 'photo'])->name('profile.photo.update');
@@ -47,11 +51,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('profile/logo', [ProfileController::class, 'logo'])->middleware('can:manage-branding')->name('profile.logo.update');
         Route::delete('profile/logo', [ProfileController::class, 'removeLogo'])->middleware('can:manage-branding')->name('profile.logo.delete');
         Route::get('developer/activity-logs', [ActivityLogController::class, 'index'])->name('developer.activity-logs.index');
+        Route::delete('developer/activity-logs', [ActivityLogController::class, 'destroy'])->name('developer.activity-logs.destroy');
         Route::get('developer/activity-logs/{activityLog}', [ActivityLogController::class, 'show'])->name('developer.activity-logs.show');
+        Route::delete('developer/error-log', [ErrorLogController::class, 'destroy'])->name('developer.error-log.destroy');
         Route::get('security/active-sessions', [SessionController::class, 'index'])->name('security.active-sessions.index');
         Route::view('developer/mobile-app', 'admin.blank', ['title' => 'Mobile App'])->name('developer.mobile-app');
         Route::view('developer/settings', 'admin.blank', ['title' => 'Settings'])->name('developer.settings');
-        Route::view('developer/error-log', 'admin.blank', ['title' => 'Error Log'])->name('developer.error-log');
+        Route::get('developer/error-log', ErrorLogController::class)->name('developer.error-log');
         Route::view('security/developer-mode', 'admin.blank', ['title' => 'Developer'])->name('security.developer-mode');
         // Opaque encrypted references are submitted in the body, never raw session IDs.
         Route::delete('security/active-sessions', [SessionController::class, 'destroy'])->name('security.active-sessions.destroy');

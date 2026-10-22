@@ -5,8 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use App\Models\AdminActivityLog;
+use App\Services\ActivityLogger;
 use Carbon\Carbon;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 
@@ -41,7 +44,25 @@ class ActivityLogController extends Controller
         return view('admin.security.activity-logs', [
             'logs' => $query->paginate(15)->withQueryString(),
             'admins' => $admin->is_super_admin ? Admin::orderBy('name')->get(['id', 'name']) : collect(),
+            'canClear' => $admin->is_super_admin,
         ]);
+    }
+
+    public function destroy(Request $request, ActivityLogger $logger): RedirectResponse
+    {
+        Gate::authorize('manage-branding');
+
+        DB::transaction(function () use ($request, $logger): void {
+            $deletedCount = AdminActivityLog::count();
+            AdminActivityLog::query()->delete();
+
+            $logger->log('activity_logs.cleared', $request->user('admin'), [
+                'deleted_count' => $deletedCount,
+            ]);
+        });
+
+        return redirect()->route('admin.developer.activity-logs.index')
+            ->with('status', 'Activity logs cleared. The clear action was recorded in the audit log.');
     }
 
     public function show(AdminActivityLog $activityLog)
