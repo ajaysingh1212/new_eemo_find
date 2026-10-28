@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Admin;
 use App\Models\AdminActivityLog;
 use App\Models\Device;
+use App\Models\Group;
 use App\Models\SupportTicket;
 use App\Models\User;
 use App\Services\ActivityLogger;
@@ -363,7 +364,7 @@ class AdminPanelTest extends TestCase
 
     public function test_all_mutations_require_authentication(): void
     {
-        foreach (['patch' => ['profile', 'support/tickets/1'], 'put' => ['profile/photo', 'profile/logo', 'profile/password'], 'delete' => ['profile/photo', 'profile/logo', 'security/active-sessions'], 'post' => ['logout', 'support/tickets']] as $method => $paths) {
+        foreach (['patch' => ['profile', 'support/tickets/1'], 'put' => ['profile/photo', 'profile/logo', 'profile/password'], 'delete' => ['profile/photo', 'profile/logo', 'security/active-sessions'], 'post' => ['logout', 'support/tickets', 'groups']] as $method => $paths) {
             foreach ($paths as $path) {
                 $this->$method('/admin/'.$path)->assertRedirect(route('admin.login'));
             }
@@ -479,6 +480,72 @@ class AdminPanelTest extends TestCase
             'created_by_user_id' => 999999,
         ])->assertSessionHasErrors('created_by_user_id');
         $this->assertDatabaseCount('support_tickets', 2);
+    }
+
+    public function test_admin_can_create_groups_with_json_members_and_a_user_can_create_only_one(): void
+    {
+        $admin = Admin::factory()->create();
+        $creator = User::factory()->create(['name' => 'Group Creator']);
+        $member = User::factory()->create(['name' => 'Group Member']);
+        $this->actingAs($admin, 'admin');
+
+        $this->get(route('admin.groups'))
+            ->assertOk()
+            ->assertSee('Create group')
+            ->assertSee('name="created_by"', false)
+            ->assertSee('id="group-creator-search"', false)
+            ->assertSee('id="group-creator-dropdown" hidden', false)
+            ->assertSee('name="group_members[]"', false)
+            ->assertSee('id="group-member-search"', false)
+            ->assertSee('id="group-member-dropdown" hidden', false)
+            ->assertSee('id="group-member-options"', false)
+            ->assertSee('group-member-option', false)
+            ->assertDontSee('name="group_members[]" class="input group-members-select" multiple', false)
+            ->assertSee('name="status"', false)
+            ->assertSee('Group Creator')
+            ->assertSee('Group Member');
+
+        $this->post(route('admin.groups.store'), [
+            'created_by' => $creator->id,
+            'group_members' => [$member->id, $creator->id],
+            'status' => 'blocked',
+        ])->assertRedirect(route('admin.groups'));
+
+        $group = Group::firstOrFail();
+        $this->assertSame([$member->id, $creator->id], $group->group_members);
+        $this->assertSame($creator->id, $group->creator->id);
+        $this->assertDatabaseHas('groups', [
+            'id' => $group->id,
+            'created_by' => $creator->id,
+            'status' => 'blocked',
+        ]);
+        $this->get(route('admin.groups'))
+            ->assertSee('Group Creator')
+            ->assertSee('Group Member')
+            ->assertSee('Blocked');
+
+        $this->post(route('admin.groups.store'), [
+            'created_by' => $creator->id,
+            'group_members' => [$member->id],
+            'status' => 'active',
+        ])->assertSessionHasErrors('created_by');
+
+        $this->assertDatabaseCount('groups', 1);
+    }
+
+    public function test_group_creation_requires_valid_members_and_status(): void
+    {
+        $admin = Admin::factory()->create();
+        $creator = User::factory()->create();
+        $this->actingAs($admin, 'admin');
+
+        $this->post(route('admin.groups.store'), [
+            'created_by' => $creator->id,
+            'group_members' => [999999],
+            'status' => 'pending',
+        ])->assertSessionHasErrors(['group_members.0', 'status']);
+
+        $this->assertDatabaseCount('groups', 0);
     }
 
     public function test_login_success_regenerates_session_and_logs_event(): void

@@ -425,11 +425,162 @@ if (trafficMap) {
 
 (() => {
     const createDialog = document.getElementById('support-create-dialog');
+    const groupCreateDialog = document.getElementById('group-create-dialog');
+    const groupForm = document.getElementById('group-create-form');
+    const creatorPicker = document.getElementById('group-creator-picker');
+    const creatorTrigger = document.getElementById('group-creator-trigger');
+    const creatorDropdown = document.getElementById('group-creator-dropdown');
+    const creatorValue = document.getElementById('created_by');
+    const creatorCurrent = document.getElementById('group-creator-current');
+    const creatorSearch = document.getElementById('group-creator-search');
+    const creatorNoResults = document.getElementById('group-creator-no-results');
+    const memberPicker = document.getElementById('group-member-control');
+    const memberTrigger = document.getElementById('group-member-trigger');
+    const memberDropdown = document.getElementById('group-member-dropdown');
+    const memberSearch = document.getElementById('group-member-search');
+    const memberOptions = document.getElementById('group-member-options');
+    const selectedMembers = document.getElementById('group-selected-members');
+    const memberCount = document.getElementById('group-member-count');
+    const memberPlaceholder = document.getElementById('group-member-placeholder');
+    const noMemberResults = document.getElementById('group-member-no-results');
     const openDialog = dialog => {
         if (dialog?.showModal && !dialog.open) dialog.showModal();
     };
 
+    const setPickerOpen = (trigger, dropdown, search, open) => {
+        if (!trigger || !dropdown) return;
+        trigger.setAttribute('aria-expanded', String(open));
+        dropdown.hidden = !open;
+        if (open) search?.focus();
+    };
+
+    if (creatorPicker && creatorTrigger && creatorDropdown && creatorValue && creatorCurrent && creatorSearch && creatorNoResults) {
+        const creatorOptions = [...creatorDropdown.querySelectorAll('.group-picker-option')];
+        const filterCreators = () => {
+            const search = creatorSearch.value.trim().toLocaleLowerCase();
+            let visibleCount = 0;
+            creatorOptions.forEach(option => {
+                const matches = option.dataset.creatorSearch.includes(search);
+                option.hidden = !matches;
+                if (matches) visibleCount++;
+            });
+            creatorNoResults.hidden = visibleCount > 0;
+        };
+
+        creatorTrigger.addEventListener('click', () => {
+            setPickerOpen(creatorTrigger, creatorDropdown, creatorSearch, creatorDropdown.hidden);
+        });
+        creatorSearch.addEventListener('input', filterCreators);
+        creatorOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                creatorValue.value = option.dataset.creatorId;
+                creatorCurrent.textContent = option.dataset.creatorName;
+                creatorCurrent.dataset.userCode = option.dataset.creatorCode;
+                creatorSearch.setCustomValidity('');
+                creatorOptions.forEach(item => item.classList.toggle('is-selected', item === option));
+                setPickerOpen(creatorTrigger, creatorDropdown, creatorSearch, false);
+            });
+        });
+
+        const initialCreator = creatorOptions.find(option => option.dataset.creatorId === creatorValue.value);
+        if (initialCreator) {
+            creatorCurrent.textContent = initialCreator.dataset.creatorName;
+            creatorCurrent.dataset.userCode = initialCreator.dataset.creatorCode;
+            initialCreator.classList.add('is-selected');
+        }
+    }
+
+    if (memberSearch && memberOptions && selectedMembers && memberCount && noMemberResults) {
+        const options = [...memberOptions.querySelectorAll('.group-member-option')];
+        const updateSelectedMembers = () => {
+            const checked = options.filter(option => option.querySelector('input').checked);
+            const countLabel = `${checked.length} ${checked.length === 1 ? 'user' : 'users'} selected`;
+            memberCount.textContent = countLabel;
+            if (memberPlaceholder) memberPlaceholder.textContent = checked.length ? `${checked.length} group ${checked.length === 1 ? 'member' : 'members'} selected` : 'Click to select group members';
+            memberSearch.setCustomValidity(checked.length ? '' : memberSearch.dataset.validationAttempted ? 'Select at least one group member.' : '');
+            selectedMembers.replaceChildren();
+
+            checked.forEach(option => {
+                const checkbox = option.querySelector('input');
+                const name = option.querySelector('.group-member-option-copy strong').textContent;
+                const chip = document.createElement('span');
+                chip.className = 'group-selected-chip';
+
+                const label = document.createElement('span');
+                label.textContent = name;
+
+                const remove = document.createElement('button');
+                remove.type = 'button';
+                remove.setAttribute('aria-label', `Remove ${name}`);
+                remove.textContent = '×';
+                remove.addEventListener('click', () => {
+                    checkbox.checked = false;
+                    checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+                });
+
+                chip.append(label, remove);
+                selectedMembers.append(chip);
+            });
+        };
+
+        memberSearch.addEventListener('input', () => {
+            const search = memberSearch.value.trim().toLocaleLowerCase();
+            let visibleCount = 0;
+
+            options.forEach(option => {
+                const matches = option.dataset.memberSearch.includes(search);
+                option.hidden = !matches;
+                if (matches) visibleCount++;
+            });
+
+            noMemberResults.hidden = visibleCount > 0;
+        });
+
+        memberTrigger?.addEventListener('click', () => {
+            setPickerOpen(memberTrigger, memberDropdown, memberSearch, memberDropdown.hidden);
+        });
+        options.forEach(option => {
+            option.querySelector('input').addEventListener('change', updateSelectedMembers);
+        });
+        updateSelectedMembers();
+    }
+
+    groupForm?.addEventListener('submit', event => {
+        if (creatorValue && !creatorValue.value) {
+            event.preventDefault();
+            creatorSearch.dataset.validationAttempted = 'true';
+            creatorSearch.setCustomValidity('Select a group owner.');
+            setPickerOpen(creatorTrigger, creatorDropdown, creatorSearch, true);
+            creatorSearch.reportValidity();
+            return;
+        }
+
+        if (memberOptions && !memberOptions.querySelector('input[name="group_members[]"]:checked')) {
+            event.preventDefault();
+            memberSearch.dataset.validationAttempted = 'true';
+            memberSearch.setCustomValidity('Select at least one group member.');
+            setPickerOpen(memberTrigger, memberDropdown, memberSearch, true);
+            memberSearch.reportValidity();
+        }
+    });
+
+    document.addEventListener('click', event => {
+        if (creatorPicker && !creatorPicker.contains(event.target)) {
+            setPickerOpen(creatorTrigger, creatorDropdown, creatorSearch, false);
+        }
+        if (memberPicker && !memberPicker.contains(event.target)) {
+            setPickerOpen(memberTrigger, memberDropdown, memberSearch, false);
+        }
+    });
+    [creatorSearch, memberSearch].forEach(search => search?.addEventListener('keydown', event => {
+        if (event.key === 'Escape') {
+            setPickerOpen(creatorTrigger, creatorDropdown, creatorSearch, false);
+            setPickerOpen(memberTrigger, memberDropdown, memberSearch, false);
+        }
+    }));
+
     document.querySelector('[data-open-support-create]')?.addEventListener('click', () => openDialog(createDialog));
+    document.querySelector('[data-open-group-create]')?.addEventListener('click', () => openDialog(groupCreateDialog));
     document.querySelectorAll('[data-open-support-ticket]').forEach(button => {
         button.addEventListener('click', () => openDialog(document.getElementById(button.dataset.openSupportTicket)));
     });

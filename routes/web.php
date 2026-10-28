@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\ActivityLogController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ErrorLogController;
+use App\Http\Controllers\Admin\GroupController;
 use App\Http\Controllers\Admin\PasswordResetController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\SessionController;
@@ -36,7 +37,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::view('tracking/geo-fence', 'admin.blank', ['title' => 'Geofence'])->name('tracking.geo-fence');
         Route::view('tracking/task', 'admin.blank', ['title' => 'Task'])->name('tracking.task');
         Route::view('tracking/sos', 'admin.blank', ['title' => 'SOS'])->name('tracking.sos');
-        Route::view('groups', 'admin.blank', ['title' => 'Group'])->name('groups');
+        Route::get('groups', [GroupController::class, 'index'])->name('groups');
+        Route::post('groups', [GroupController::class, 'store'])->name('groups.store');
         Route::view('licence', 'admin.blank', ['title' => 'Licence'])->name('licence');
         Route::view('licence/subscription', 'admin.blank', ['title' => 'Subscription'])->name('licence.subscription');
         Route::view('licence/payments', 'admin.blank', ['title' => 'Payments'])->name('licence.payments');

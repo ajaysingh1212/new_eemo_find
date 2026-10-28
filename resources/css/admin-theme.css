@@ -1838,6 +1838,473 @@ body.admin-shell {
     flex-direction: column;
 }
 
+.admin-shell .group-table-wrap {
+    overflow-x: auto;
+}
+
+.admin-shell .group-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.admin-shell .group-table th,
+.admin-shell .group-table td {
+    padding: 14px 12px;
+    border-bottom: 1px solid #e4edf9;
+    vertical-align: top;
+}
+
+.admin-shell .group-table th {
+    color: #7185a0;
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+
+.admin-shell .group-table td small {
+    display: block;
+    margin-top: 3px;
+    color: #7185a0;
+    font-size: .76rem;
+}
+
+.admin-shell .group-id {
+    color: #286bd0;
+    font-weight: 750;
+}
+
+.admin-shell .group-member-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.admin-shell .group-member-list span {
+    padding: 3px 8px;
+    border-radius: 999px;
+    color: #275b9b;
+    background: #eaf2ff;
+    font-size: .76rem;
+    white-space: nowrap;
+}
+
+.admin-shell .group-status {
+    display: inline-flex;
+    padding: 4px 9px;
+    border-radius: 999px;
+    font-size: .75rem;
+    font-weight: 700;
+}
+
+.admin-shell .group-status.is-active {
+    color: #18764f;
+    background: #e2f6ec;
+}
+
+.admin-shell .group-status.is-inactive {
+    color: #886018;
+    background: #fff3d8;
+}
+
+.admin-shell .group-status.is-blocked {
+    color: #a63d4b;
+    background: #fde9ec;
+}
+
+.admin-shell dialog.support-dialog.group-create-dialog {
+    width: min(700px, calc(100vw - 32px));
+    max-height: min(850px, calc(100vh - 40px));
+    overflow-y: auto;
+    padding: 0;
+    border-radius: 22px;
+}
+
+.admin-shell .group-modal-header {
+    align-items: flex-start;
+}
+
+.admin-shell .group-modal-header h3 {
+    margin: 5px 0 3px;
+    color: #172b4b;
+    font-size: 1.45rem;
+    font-weight: 750;
+}
+
+.admin-shell .group-create-form {
+    display: grid;
+    gap: 20px;
+    padding: 22px 28px 26px;
+}
+
+.admin-shell .group-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.admin-shell .group-form-grid .user-field {
+    margin: 0;
+}
+
+.admin-shell .group-form-grid .user-field select,
+.admin-shell .group-member-search-wrap input {
+    width: 100%;
+    min-height: 46px;
+    padding: 0 14px;
+    border: 1px solid #dce5f3;
+    border-radius: 12px;
+    background: #fff;
+    color: #233b5b;
+    font: inherit;
+}
+
+.admin-shell .group-form-grid .user-field select:focus,
+.admin-shell .group-member-search-wrap input:focus {
+    border-color: #78a5ee;
+    outline: 3px solid rgba(67, 136, 245, .14);
+}
+
+.admin-shell .group-field-hint {
+    color: #71819a;
+}
+
+.admin-shell .group-member-field {
+    min-width: 0;
+    grid-column: 1 / -1;
+}
+
+.admin-shell .group-creator-field,
+.admin-shell .group-member-picker {
+    position: relative;
+    overflow: visible;
+    border: 0;
+    background: transparent;
+}
+
+.admin-shell .group-select-picker {
+    position: relative;
+}
+
+.admin-shell .group-picker-trigger {
+    display: flex;
+    width: 100%;
+    min-height: 46px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0 14px;
+    border: 1px solid #dce5f3;
+    border-radius: 12px;
+    background: #fff;
+    color: #647791;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color .16s ease, box-shadow .16s ease;
+}
+
+.admin-shell .group-picker-trigger:hover,
+.admin-shell .group-picker-trigger[aria-expanded="true"] {
+    border-color: #9ab9eb;
+    box-shadow: 0 0 0 3px rgba(67, 136, 245, .09);
+}
+
+.admin-shell .group-picker-current {
+    overflow: hidden;
+    color: #233b5b;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admin-shell .group-picker-current[data-user-code]::after {
+    margin-left: 8px;
+    color: #8292a8;
+    content: attr(data-user-code);
+    font-size: .76rem;
+}
+
+.admin-shell .group-picker-chevron {
+    width: 16px;
+    height: 16px;
+    flex: none;
+    color: #8292a8;
+    transition: transform .16s ease;
+}
+
+.admin-shell .group-picker-trigger[aria-expanded="true"] .group-picker-chevron {
+    transform: rotate(180deg);
+}
+
+.admin-shell .group-picker-dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    left: 0;
+    z-index: 20;
+    overflow: hidden;
+    border: 1px solid #dce5f3;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 16px 38px rgba(27, 52, 91, .16);
+}
+
+.admin-shell .group-picker-dropdown[hidden] {
+    display: none;
+}
+
+.admin-shell .group-picker-options,
+.admin-shell .group-member-options {
+    max-height: 210px;
+    overflow-y: auto;
+    padding: 0 8px 8px;
+}
+
+.admin-shell .group-picker-option {
+    display: flex;
+    width: 100%;
+    min-height: 56px;
+    align-items: center;
+    gap: 11px;
+    padding: 8px 10px;
+    border: 0;
+    border-radius: 11px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.admin-shell .group-picker-option:hover,
+.admin-shell .group-picker-option.is-selected {
+    background: #f0f5ff;
+}
+
+.admin-shell .group-picker-option[hidden] {
+    display: none;
+}
+
+.admin-shell .group-picker-option.is-selected .group-member-checkmark {
+    border-color: #3478df;
+    background: #3478df;
+    color: #fff;
+}
+
+.admin-shell .group-picker-option.is-selected .group-member-selected-mark {
+    opacity: 1;
+}
+
+.admin-shell .group-member-trigger {
+    min-height: 52px;
+    border: 0;
+    border-radius: 14px;
+    background: transparent;
+    box-shadow: none;
+}
+
+.admin-shell .group-member-trigger:hover,
+.admin-shell .group-member-trigger[aria-expanded="true"] {
+    border: 0;
+    background: #f7faff;
+    box-shadow: none;
+}
+
+.admin-shell .group-member-trigger .group-member-count {
+    margin-left: auto;
+}
+
+.admin-shell .group-member-control {
+    position: relative;
+}
+
+.admin-shell .group-member-dropdown {
+    top: calc(100% + 5px);
+}
+
+.admin-shell .group-member-dropdown .group-member-search-wrap {
+    margin-top: 12px;
+}
+
+.admin-shell .group-member-count {
+    color: #286bd0;
+    white-space: nowrap;
+}
+
+.admin-shell .group-member-search-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin: 10px 12px;
+}
+
+.admin-shell .group-member-search-wrap > .icon {
+    position: absolute;
+    left: 12px;
+    width: 17px;
+    height: 17px;
+    color: #8292a8;
+    pointer-events: none;
+}
+
+.admin-shell .group-member-search-wrap input {
+    min-height: 42px;
+    padding-left: 38px;
+    font-size: .84rem;
+}
+
+.admin-shell .group-member-option {
+    position: relative;
+    display: flex;
+    min-height: 58px;
+    align-items: center;
+    gap: 11px;
+    padding: 8px 10px;
+    border-radius: 11px;
+    cursor: pointer;
+    transition: background .16s ease;
+}
+
+.admin-shell .group-member-option:hover {
+    background: #f0f5ff;
+}
+
+.admin-shell .group-member-option[hidden],
+.admin-shell .group-member-no-results[hidden] {
+    display: none;
+}
+
+.admin-shell .group-member-option input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+}
+
+.admin-shell .group-member-checkmark {
+    display: grid;
+    width: 20px;
+    height: 20px;
+    flex: none;
+    place-items: center;
+    border: 1px solid #cbd7e8;
+    border-radius: 6px;
+    background: #fff;
+    color: transparent;
+}
+
+.admin-shell .group-member-checkmark .icon {
+    width: 13px;
+    height: 13px;
+}
+
+.admin-shell .group-member-option input:checked + .group-member-checkmark {
+    border-color: #3478df;
+    background: #3478df;
+    color: #fff;
+}
+
+.admin-shell .group-member-option input:focus-visible + .group-member-checkmark {
+    outline: 3px solid rgba(67, 136, 245, .25);
+}
+
+.admin-shell .group-member-option-copy {
+    display: grid;
+    min-width: 0;
+    gap: 2px;
+}
+
+.admin-shell .group-member-option-copy strong {
+    overflow: hidden;
+    color: #233b5b;
+    font-size: .84rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admin-shell .group-member-option-copy small {
+    color: #8292a8;
+    font-size: .72rem;
+}
+
+.admin-shell .group-member-selected-mark {
+    margin-left: auto;
+    color: #286bd0;
+    font-size: .72rem;
+    font-weight: 700;
+    opacity: 0;
+}
+
+.admin-shell .group-member-option input:checked ~ .group-member-selected-mark {
+    opacity: 1;
+}
+
+.admin-shell .group-member-no-results {
+    margin: 0;
+    padding: 22px 12px;
+    color: #71819a;
+    font-size: .82rem;
+    text-align: center;
+}
+
+.admin-shell .group-selected-members {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    padding: 0 12px 12px;
+}
+
+.admin-shell .group-selected-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 7px 4px 10px;
+    border: 1px solid #d8e6fb;
+    border-radius: 999px;
+    background: #edf4ff;
+    color: #275b9b;
+    font-size: .75rem;
+    font-weight: 650;
+}
+
+.admin-shell .group-selected-chip button {
+    display: grid;
+    width: 19px;
+    height: 19px;
+    place-items: center;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: #53759d;
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.admin-shell .group-selected-chip button:hover {
+    background: #dceaff;
+    color: #174b91;
+}
+
+.admin-shell .group-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding-top: 16px;
+    border-top: 1px solid #e9eef7;
+}
+
+.admin-shell .group-modal-actions .primary-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.admin-shell .group-modal-actions .primary-button .icon {
+    width: 16px;
+    height: 16px;
+}
+
 .admin-shell .support-ticket-row {
     display: grid;
     grid-template-columns: minmax(170px, .8fr) minmax(180px, 1.5fr) 100px auto;
@@ -3862,5 +4329,34 @@ body.admin-shell {
 
     .metric-detail {
         gap: 3px;
+    }
+}
+
+@media (max-width: 560px) {
+    .admin-shell dialog.support-dialog.group-create-dialog {
+        max-height: calc(100vh - 24px);
+        border-radius: 17px;
+    }
+
+    .admin-shell .group-modal-header {
+        padding: 20px 18px 16px;
+    }
+
+    .admin-shell .group-create-form {
+        gap: 16px;
+        padding: 18px;
+    }
+
+    .admin-shell .group-form-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 15px;
+    }
+
+    .admin-shell .group-member-field {
+        grid-column: auto;
+    }
+
+    .admin-shell .group-modal-actions {
+        flex-wrap: wrap;
     }
 }
